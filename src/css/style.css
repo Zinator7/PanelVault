@@ -35,6 +35,16 @@ header.scrolled {
   border-bottom: 1px solid var(--border);
 }
 
+header nav a{
+    color: #ffffff;
+    font-weight: bold;
+}
+
+header nav a:hover{
+    text-decoration: underline;
+
+}
+
 .logo {
   font-family: 'Big Shoulders Display', sans-serif;
   font-weight: 900;
