@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion — PanelVault</title>
+    <title>Inscription — PanelVault</title>
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/auth.css">
 </head>
 <body>
     <header id="hdr">
-        <a class="logo" href="../../../index.html">Panel<em>Vault</em></a>
+        <a class="logo" href="../../../index.php">Panel<em>Vault</em></a>
         <div class="h-btns">
-            <a href="../../../index.html" class="btn btn-ghost">← Retour à l'accueil</a>
+            <a href="../../../index.php" class="btn btn-ghost">← Retour à l'accueil</a>
         </div>
     </header>
 
@@ -25,23 +25,27 @@
         <div class="auth-noise"></div>
         <div class="auth-overlay"></div>
         <div class="auth-card">
-            <div class="auth-ghost-num">01</div>
-            <div class="auth-eyebrow">Ravi de te revoir</div>
-            <h1 class="auth-title">Connexion</h1>
+            <div class="auth-ghost-num">02</div>
+            <div class="auth-eyebrow">Rejoins-nous</div>
+            <h1 class="auth-title">Inscription</h1>
             <form class="auth-form" action="#" method="POST">
+                <div class="field">
+                    <label for="username">Pseudo</label>
+                    <input type="text" id="username" name="username" placeholder="Choisis ton pseudo" required>
+                </div>
                 <div class="field">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Ton adresse email" required>
                 </div>
                 <div class="field">
                     <label for="password">Mot de passe</label>
-                    <input type="password" id="password" name="password" placeholder="Ton mot de passe" required>
+                    <input type="password" id="password" name="password" placeholder="Crée ton mot de passe" required>
                 </div>
-                <button class="btn btn-red btn-full" type="submit">Se connecter →</button>
+                <button class="btn btn-red btn-full" type="submit">Créer mon compte →</button>
             </form>
             <hr class="auth-divider">
             <div class="auth-link">
-                <p>Pas encore de compte ? <a href="register.html">S'inscrire</a></p>
+                <p>Déjà un compte ? <a href="login.php">Se connecter</a></p>
             </div>
         </div>
     </div>
