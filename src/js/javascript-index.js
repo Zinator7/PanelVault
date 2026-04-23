@@ -59,17 +59,17 @@ if (statsSection) {
   }, { threshold: 0.3 }).observe(statsSection);
 }
 
-/* Scroll reveal */
-new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); }
+/* Scroll reveal JS */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // On arrête d'observer une fois l'élément affiché
+      revealObserver.unobserve(entry.target);
+    }
   });
-}, { threshold: 0.1 }).observe(document.body);
+}, { threshold: 0.15 });
 
 document.querySelectorAll('.reveal').forEach(el => {
-  new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      entries[0].target.classList.add('visible');
-    }
-  }, { threshold: 0.1 }).observe(el);
+  revealObserver.observe(el);
 });
