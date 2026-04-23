@@ -24,7 +24,8 @@ function select_user_by_email($conn, $email) {
 }
 
 function list_users($conn) {
-    $sql = "SELECT id, username, avatar, level, xp, points, streak FROM `users` ORDER BY points DESC";
+    // On ordonne par XP en premier, puis par points en cas d'égalité
+    $sql = "SELECT id, username, avatar, level, xp, points, streak, streak_max FROM `users` ORDER BY xp DESC, points DESC";
     $res = mysqli_query($conn, $sql);
     $tab = [];
     while ($row = mysqli_fetch_assoc($res)) $tab[] = $row;

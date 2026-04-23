@@ -44,4 +44,18 @@ function delete_progress($conn, $user_id, $comic_id) {
     $sql      = "DELETE FROM `reading_progress` WHERE user_id = $user_id AND comic_id = $comic_id";
     return mysqli_query($conn, $sql);
 }
+
+// Fonction pour obtenir le temps de lecture total d'un utilisateur
+function get_total_reading_time($conn, $user_id) {
+    $user_id = (int) $user_id;
+    // On somme le nombre total de pages des comics terminés par l'utilisateur
+    // On assume qu'une page prend environ 1 minute à lire pour l'exemple
+    $sql = "SELECT SUM(c.total_pages) as total_pages_read FROM `reading_progress` rp JOIN `comics` c ON rp.comic_id = c.id WHERE rp.user_id = $user_id AND rp.completed = 1";
+    $res = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($res);
+    $total_pages_read = (int) $row['total_pages_read'];
+    // On convertit les minutes en heures (arrondi à l'entier le plus proche)
+    $reading_hours = round($total_pages_read / 60);
+    return $reading_hours;
+}
 ?>

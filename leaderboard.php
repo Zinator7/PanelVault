@@ -1,5 +1,12 @@
 <?php
-include '../../php/db_connect.php';
+// On démarre la session pour récupérer les infos de l'utilisateur connecté
+session_start();
+// On inclut les fichiers nécessaires (Base de données et CRUD)
+include 'src/php/db_connect.php';
+include 'src/php/mvc/mvc_users/crud_users.php';
+
+// On récupère l'utilisateur en session s'il est connecté
+if (isset($_SESSION['user'])) { $user = $_SESSION['user']; }
 
 
 ?>
@@ -13,6 +20,7 @@ include '../../php/db_connect.php';
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="src/css/style.css">
     <link rel="stylesheet" href="src/css/leaderboard.css">
+    <link rel="stylesheet" href="src/css/dashboard.css">
 </head>
 <body>
     <header id="hdr">
@@ -22,9 +30,32 @@ include '../../php/db_connect.php';
             <a href="index.php#how">Comment ça marche</a>
             <a href="leaderboard.php">Classement</a>
         </nav>
-        <div class="h-btns">
-            <a href="src/php/pages_connexion/login.php" class="btn btn-ghost">Connexion</a>
-            <a href="src/php/pages_connexion/register.php" class="btn btn-red">S'inscrire</a>
+        <div class="h-btns"> 
+            <?php 
+            // On vérifie si l'utilisateur est connecté pour afficher les bons boutons
+            if (isset($_SESSION['user']) == true) { 
+            ?>
+                <!-- Si l'utilisateur est connecté, on affiche son mini-profil et un menu déroulant -->
+                <div class="user-dropdown-wrapper">
+                    <a href="#" class="user-trigger">
+                        <div class="profile-avatar-mini"><?php echo strtoupper(substr($user['username'], 0, 2)); ?></div>
+                        <span class="username-display"><?php echo htmlspecialchars($user['username']); ?></span>
+                    </a>
+                    <div class="user-dropdown-menu">
+                        <a href="src/php/pages_users/profil.php">Mon Profil</a>
+                        <a href="src/php/pages_users/dashboard.php">Dashboard</a>
+                        <a href="#">Paramètres</a>
+                        <hr>
+                        <a href="src/php/pages_connexion/logout.php">Déconnexion</a>
+                    </div>
+                </div>
+            <?php 
+            } else { 
+            ?>
+                <!-- Si l'utilisateur n'est PAS connecté, on affiche les boutons de connexion/inscription -->
+                <a href="src/php/pages_connexion/login.php" class="btn btn-ghost">Connexion</a>
+                <a href="src/php/pages_connexion/register.php" class="btn btn-red">S'inscrire</a>
+            <?php } ?>
             <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
         </div>
     </header>
@@ -35,8 +66,21 @@ include '../../php/db_connect.php';
         <a href="index.php#how" onclick="closeMenu()">Comment ça marche</a>
         <a href="leaderboard.php" onclick="closeMenu()">Classement</a>
         <hr style="border-color:var(--border);border-width:0.5px;"/>
-        <a href="src/php/pages_connexion/login.php" class="mm-ghost">Connexion</a>
-        <a href="src/php/pages_connexion/register.php" class="mm-red">S'inscrire →</a>
+        <?php 
+        // On vérifie si l'utilisateur est connecté pour afficher les bons boutons dans le menu mobile
+        if (isset($_SESSION['user']) == true) { 
+        ?>
+            <a href="src/php/pages_users/profil.php" class="mm-ghost">Mon Profil</a>
+            <a href="src/php/pages_users/dashboard.php" class="mm-ghost">Dashboard</a>
+            <a href="#" class="mm-ghost">Paramètres</a>
+            <hr style="border-color:var(--border);border-width:0.5px;"/>
+            <a href="src/php/pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
+        <?php 
+        } else { 
+        ?>
+            <a href="src/php/pages_connexion/login.php" class="mm-ghost">Connexion</a>
+            <a href="src/php/pages_connexion/register.php" class="mm-red">S'inscrire →</a>
+        <?php } ?>
     </div>
 
     <main class="leaderboard-page">
@@ -175,5 +219,6 @@ include '../../php/db_connect.php';
     </footer>
 
     <script src="src/js/javascript-index.js"></script>
+    <script src="src/js/js-profil.js"></script> <!-- Inclusion du nouveau JS -->
 </body>
 </html>

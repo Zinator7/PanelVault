@@ -1,14 +1,69 @@
 <?php
+// On démarre la session pour récupérer les données de l'utilisateur
 session_start();
+
+// On inclut les fichiers de connexion et les fonctions CRUD (style L1 : include)
 include '../../php/db_connect.php';
 include '../../php/mvc/mvc_users/crud_users.php';
+include '../../php/mvc/mvc_reading/crud_reading.php';
+include '../../php/mvc/mvc_badges/crud_badges.php';
 
-if(!isset($_SESSION['user'])){
+// Vérification de sécurité : si on n'est pas connecté, on redirige vers le login
+if (isset($_SESSION['user']) == false) {
     header("Location: ../pages_connexion/login.php");
     exit();
 }
-$user = $_SESSION['user'];
 
+// On récupère l'utilisateur en session
+$user_session = $_SESSION['user'];
+$user_id = $user_session['id'];
+
+// Pour être sûr d'avoir les "vraies" stats à jour (XP, Niveau), on refait un SELECT
+$user = select_user($conn, $user_id);
+
+// --- CALCULS DES STATISTIQUES (Version explicite L1) ---
+
+// 1. Niveau et XP
+if (isset($user['level'])) {
+    $niveau = $user['level'];
+} else {
+    $niveau = 1;
+}
+
+if (isset($user['xp'])) {
+    $xp_totale = $user['xp'];
+} else {
+    $xp_totale = 0;
+}
+
+// 2. Barre de progression (1000 XP par palier)
+$xp_par_palier = 1000;
+$xp_seuil_actuel = ($niveau - 1) * $xp_par_palier;
+$xp_dans_le_niveau = $xp_totale - $xp_seuil_actuel;
+
+// Calcul du pourcentage pour le CSS (--xp-w) et l'anneau SVG
+$pourcentage = ($xp_dans_le_niveau / $xp_par_palier) * 100;
+if ($pourcentage > 100) {
+    $pourcentage = 100;
+}
+if ($pourcentage < 0) {
+    $pourcentage = 0;
+}
+
+// 3. Date d'inscription
+$date_membre = "Inconnu";
+if (isset($user['created_at'])) {
+    $date_objet = new DateTime($user['created_at']);
+    $date_membre = date_format($date_objet, 'd M. Y');
+}
+
+// 4. Données réelles des autres tables
+$badges_possedes = list_user_badges($conn, $user_id);
+$nb_badges = count($badges_possedes);
+
+$comics_en_cours = list_reading($conn, $user_id);
+$comics_finis = list_completed($conn, $user_id);
+$nb_lus = count($comics_finis);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -20,45 +75,67 @@ $user = $_SESSION['user'];
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../css/dashboard.css">
   <link rel="stylesheet" href="../../css/profile.css">
+  <!-- On inclut le nouveau fichier JS pour le profil -->
+  <script src="../../js/js-profil.js" defer></script>
 </head>
 <body>
 
   <header id="hdr">
     <a class="logo" href="../../../index.php">Panel<em>Vault</em></a>
     <nav>
-      <a href="../../../index.php#features">Fonctionnalités</a>
-      <a href="../../../index.php#how">Comment ça marche</a>
-      <a href="../../../leaderboard.php">Classement</a>
+      <a href="../../../index.php#features">Fonctionnalités</a> <!-- Lien vers l'accueil -->
+      <a href="../../../index.php#how">Comment ça marche</a> <!-- Lien vers l'accueil -->
+      <a href="../../../leaderboard.php">Classement</a> <!-- Lien vers le classement -->
     </nav>
+
     <div class="h-btns">
-      <a href="../pages_connexion/login.php" class="btn btn-ghost">Connexion</a>
-      <a href="../pages_connexion/register.php" class="btn btn-red">S'inscrire</a>
+      <?php 
+      // On vérifie si l'utilisateur est connecté pour afficher les bons boutons
+      if (isset($_SESSION['user']) == true) { 
+      ?>
+        <!-- Si l'utilisateur est connecté, on affiche son mini-profil et un menu déroulant -->
+        <div class="user-dropdown-wrapper">
+            <a href="#" class="user-trigger">
+                <div class="profile-avatar-mini">
+                    <?php echo strtoupper(substr($user['username'], 0, 2)); ?> <!-- Initiales du pseudo -->
+                </div>
+                <span class="username-display"><?php echo htmlspecialchars($user['username']); ?></span>
+            </a>
+            <div class="user-dropdown-menu">
+                <a href="profil.php">Mon Profil</a>
+                <a href="dashboard.php">Dashboard</a>
+                <a href="#">Paramètres</a>
+                <hr>
+                <a href="../pages_connexion/logout.php">Déconnexion</a>
+            </div>
+        </div>
+      <?php 
+      } else { 
+      ?>
+        <!-- Si l'utilisateur n'est PAS connecté, on affiche les boutons de connexion/inscription -->
+        <!-- Si non connecté : Boutons classiques -->
+        <a href="../pages_connexion/login.php" class="btn btn-ghost">Connexion</a>
+        <a href="../pages_connexion/register.php" class="btn btn-red">S'inscrire</a>
+      <?php } ?>
       <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </header>
-
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="../../../index.php#features" onclick="closeMenu()">Fonctionnalités</a>
-    <a href="../../../index.php#how" onclick="closeMenu()">Comment ça marche</a>
-    <a href="../../../leaderboard.php">Classement</a>
-    <hr style="border-color:var(--border);border-width:0.5px;"/>
-    <a href="../pages_connexion/login.php" class="mm-ghost">Connexion</a>
-    <a href="../pages_connexion/register.php" class="mm-red">S'inscrire →</a>
-  </div>
 
   <main class="dashboard-layout">
 
     <!-- ═══ SIDEBAR ═══ -->
     <aside class="dashboard-sidebar">
       <div class="user-profile">
-        <div class="profile-avatar"><?= strtoupper(substr($user['username'], 0, 2)) ?></div>
+        <div class="profile-avatar"><?php echo strtoupper(substr($user['username'], 0, 2)); ?></div>
         <div class="profile-details">
-          <span class="profile-name"><?= htmlspecialchars($user['username']) ?></span>
-          <span class="profile-level">Lvl. <?= $user['level'] ?? 1 ?></span>
+          <span class="profile-name"><?php echo htmlspecialchars($user['username']); ?></span> <!-- Pseudo de l'utilisateur -->
+          <span class="profile-level">Lvl. <?php echo $niveau; ?></span> <!-- Niveau de l'utilisateur -->
           <div class="xp-bar-wrap">
-            <div class="xp-bar" style="--xp-w: 68%"></div>
+            <!-- La barre d'XP se remplit en fonction du pourcentage calculé -->
+            <div class="xp-bar" style="--xp-w: <?php echo $pourcentage; ?>%"></div> 
           </div>
-          <span class="xp-next-level">6 210 / 9 100 XP → Lvl. 29</span>
+          <!-- Affichage de l'XP actuelle dans le niveau et l'XP nécessaire pour le prochain niveau -->
+          <span class="xp-next-level"><?php echo $xp_dans_le_niveau; ?> / <?php echo $xp_par_palier; ?> XP → Lvl. <?php echo ($niveau + 1); ?></span> 
         </div>
       </div>
       <nav class="sidebar-nav">
@@ -66,11 +143,11 @@ $user = $_SESSION['user'];
           <span class="icon">🏠</span> Accueil
         </a>
         <a href="#">
-          <span class="icon">📚</span> Ma Bibliothèque
+          <span class="icon">📚</span> Ma Bibliothèque <!-- Lien vers la bibliothèque -->
         </a>
         <a href="profil.php" class="active">
-          <span class="icon">👤</span> Mon Profil
-        </a>
+          <span class="icon">👤</span> Mon Profil <!-- Lien actif vers le profil -->
+        </a> 
         <a href="#">
           <span class="icon">🏅</span> Mes Badges
         </a>
@@ -80,7 +157,7 @@ $user = $_SESSION['user'];
         <a href="#">
           <span class="icon">⚙️</span> Paramètres
         </a>
-        <a href="#" class="logout-link">
+        <a href="../pages_connexion/logout.php" class="logout-link">
           <span class="icon">🚪</span> Déconnexion
         </a>
       </nav>
@@ -107,24 +184,24 @@ $user = $_SESSION['user'];
 
         <!-- Avatar + ring -->
         <div class="profile-avatar-wrap">
-          <div class="profile-avatar-lg"><?= strtoupper(substr($user['username'], 0, 2)) ?></div>
-          <svg class="profile-ring" viewBox="0 0 136 136">
+          <div class="profile-avatar-lg"><?php echo strtoupper(substr($user['username'], 0, 2)); ?></div>
+          <svg class="profile-ring" viewBox="0 0 136 136"> <!-- Anneau de progression autour de l'avatar -->
             <circle class="ring-bg" cx="68" cy="68" r="62"/>
-            <circle class="ring-fg" cx="68" cy="68" r="62" data-progress="0.6824"/>
+            <circle class="ring-fg" cx="68" cy="68" r="62" data-progress="<?php echo ($pourcentage / 100); ?>"/> <!-- data-progress pour JS -->
           </svg>
-          <span class="profile-level-badge">LVL <?= $user['level'] ?? 1 ?></span>
+          <span class="profile-level-badge">LVL <?php echo $niveau; ?></span>
         </div>
 
         <!-- Info -->
         <div class="profile-info">
-          <h1 class="profile-username"><?= htmlspecialchars($user['username']) ?></h1>
-          <p class="profile-tagline">Lecteur passionné · Collectionneur de scans rares · Membre depuis le 12 janv. 2025</p>
+          <h1 class="profile-username"><?php echo htmlspecialchars($user['username']); ?></h1> <!-- Pseudo de l'utilisateur -->
+          <p class="profile-tagline">Lecteur passionné · Membre depuis le <?php echo $date_membre; ?></p> <!-- Date d'inscription -->
           <div class="profile-pills">
-            <span class="profile-pill accent">🔥 7 jours de streak</span>
-            <span class="profile-pill accent">⭐ Top 12 Classement</span>
-            <span class="profile-pill">📖 94 comics lus</span>
-            <span class="profile-pill">🏅 12 badges</span>
-            <span class="profile-pill">⏱️ 52h de lecture</span>
+            <span class="profile-pill accent">🔥 <?php echo $streak_actuel; ?> jours de streak</span> <!-- Streak actuel -->
+            <span class="profile-pill accent">⭐ <?php echo $top_classement_text; ?></span> <!-- Rang de l'utilisateur -->
+            <span class="profile-pill">📖 <?php echo $nb_lus; ?> comics lus</span> <!-- Nombre de comics lus -->
+            <span class="profile-pill">🏅 <?php echo $nb_badges; ?> badges</span> <!-- Nombre de badges débloqués -->
+            <span class="profile-pill">⏱️ <?php echo $temps_lecture_heures; ?>h de lecture</span>
           </div>
         </div>
 
@@ -146,32 +223,32 @@ $user = $_SESSION['user'];
         <div class="profile-stats-grid">
           <div class="stat-card reveal">
             <span class="stat-icon">✨</span>
-            <span class="stat-value"><span class="ctr" data-target="6210">0</span> XP</span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $xp_totale; ?>">0</span> XP</span> <!-- XP totale -->
             <span class="stat-label">Total XP</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">📖</span>
-            <span class="stat-value"><span class="ctr" data-target="94">0</span></span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_lus; ?>">0</span></span> <!-- Comics lus -->
             <span class="stat-label">Comics lus</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">🔥</span>
-            <span class="stat-value"><span class="ctr" data-target="7">0</span> j.</span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $streak_actuel; ?>">0</span> j.</span> <!-- Streak actuel -->
             <span class="stat-label">Streak actuel</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">🏅</span>
-            <span class="stat-value"><span class="ctr" data-target="12">0</span></span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_badges; ?>">0</span></span> <!-- Badges débloqués -->
             <span class="stat-label">Badges débloqués</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">⏱️</span>
-            <span class="stat-value"><span class="ctr" data-target="52">0</span> h</span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $temps_lecture_heures; ?>">0</span> h</span> <!-- Temps de lecture -->
             <span class="stat-label">Temps de lecture</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">✅</span>
-            <span class="stat-value"><span class="ctr" data-target="8">0</span></span>
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_series_terminees; ?>">0</span></span> <!-- Séries terminées -->
             <span class="stat-label">Séries terminées</span>
           </div>
         </div>
@@ -194,24 +271,24 @@ $user = $_SESSION['user'];
             </div>
 
             <div class="lp-levels-row">
-              <span class="lp-lvl current">28</span>
+              <span class="lp-lvl current"><?php echo $niveau; ?></span>
               <span class="lp-lvl sep">/</span>
-              <span class="lp-lvl next">29 →</span>
+              <span class="lp-lvl next"><?php echo ($niveau + 1); ?> →</span>
             </div>
 
             <div class="lp-bar-wrap">
-              <div class="lp-bar" style="--lp-w: 68%"></div>
+              <div class="lp-bar" style="--lp-w: <?php echo $pourcentage; ?>%"></div>
             </div>
 
             <div class="lp-xp-row">
-              <span><strong>6 210 XP</strong> obtenus</span>
-              <span>encore <strong>2 890 XP</strong></span>
+              <span><strong><?php echo $xp_dans_le_niveau; ?> XP</strong> obtenus</span>
+              <span>encore <strong><?php echo ($xp_par_palier - $xp_dans_le_niveau); ?> XP</strong></span>
             </div>
 
             <div class="lp-meta">
-              <div class="lp-meta-row">📅 <span>Membre depuis <strong>12 janv. 2025</strong></span></div>
-              <div class="lp-meta-row">🏆 <span>Classé <strong>#12</strong> cette semaine</span></div>
-              <div class="lp-meta-row">🔥 <span>Meilleur streak : <strong>21 jours</strong></span></div>
+              <div class="lp-meta-row">📅 <span>Membre depuis <strong><?php echo $date_membre; ?></strong></span></div>
+              <div class="lp-meta-row">🏆 <span><?php echo $top_classement_text; ?> cette semaine</span></div>
+              <div class="lp-meta-row">🔥 <span>Meilleur streak : <strong><?php if(isset($user['streak_max'])) { echo $user['streak_max']; } else { echo 0; } ?> jours</strong></span></div>
             </div>
           </div>
 
@@ -223,7 +300,7 @@ $user = $_SESSION['user'];
                 <h3 class="streak-title">Calendrier de Lecture</h3>
               </div>
               <div class="streak-count">
-                <span class="streak-count-num">🔥 7</span>
+                <span class="streak-count-num">🔥 <?php echo $streak_actuel; ?></span> <!-- Streak actuel -->
                 <span class="streak-count-label">jours consécutifs</span>
               </div>
             </div>
@@ -257,85 +334,24 @@ $user = $_SESSION['user'];
         <h2 class="s-title reveal">Vos Badges.</h2>
 
         <div class="badges-grid">
-
-          <!-- Unlocked -->
-          <div class="badge-card reveal">
-            <span class="badge-icon">👣</span>
-            <span class="badge-name">Premier Pas</span>
-            <span class="badge-desc">Premier comic lu</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">📚</span>
-            <span class="badge-name">Dévoreur</span>
-            <span class="badge-desc">10 comics lus</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">🔥</span>
-            <span class="badge-name">Lecteur Assidu</span>
-            <span class="badge-desc">7 jours de streak</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">🦇</span>
-            <span class="badge-name">Batmaniac</span>
-            <span class="badge-desc">5 comics Batman terminés</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">🌙</span>
-            <span class="badge-name">Noctambule</span>
-            <span class="badge-desc">Lu après minuit</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">🏃</span>
-            <span class="badge-name">Marathonien</span>
-            <span class="badge-desc">5 comics en un jour</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">⭐</span>
-            <span class="badge-name">Légende</span>
-            <span class="badge-desc">5 000 XP atteints</span>
-          </div>
-
-          <div class="badge-card reveal">
-            <span class="badge-icon">🗂️</span>
-            <span class="badge-name">Collectionneur</span>
-            <span class="badge-desc">25 comics en bibliothèque</span>
-          </div>
-
-          <!-- Locked -->
-          <div class="badge-card locked reveal">
-            <span class="badge-icon">💀</span>
-            <span class="badge-name">Immortel</span>
-            <span class="badge-desc">365 jours de streak</span>
-            <span class="badge-locked-hint">🔒 Encore 358 jours</span>
-          </div>
-
-          <div class="badge-card locked reveal">
-            <span class="badge-icon">🌟</span>
-            <span class="badge-name">Dieu de la Lecture</span>
-            <span class="badge-desc">1 000 comics lus</span>
-            <span class="badge-locked-hint">🔒 Encore 906 comics</span>
-          </div>
-
-          <div class="badge-card locked reveal">
-            <span class="badge-icon">💎</span>
-            <span class="badge-name">Ultra Collector</span>
-            <span class="badge-desc">100 séries différentes</span>
-            <span class="badge-locked-hint">🔒 Encore 88 séries</span>
-          </div>
-
-          <div class="badge-card locked reveal">
-            <span class="badge-icon">⏰</span>
-            <span class="badge-name">Centenaire</span>
-            <span class="badge-desc">100h de lecture totale</span>
-            <span class="badge-locked-hint">🔒 Encore 48h</span>
-          </div>
-
+            <?php 
+            // On affiche les badges que l'utilisateur possède réellement
+            if (count($badges_possedes) > 0) { 
+                foreach ($badges_possedes as $badge) { 
+            ?>
+                    <div class="badge-card reveal">
+                        <span class="badge-icon"><?php echo $badge['icon']; ?></span>
+                        <span class="badge-name"><?php echo htmlspecialchars($badge['name']); ?></span>
+                        <span class="badge-desc"><?php echo htmlspecialchars($badge['description']); ?></span>
+                    </div>
+            <?php 
+                }
+            } else { 
+            ?>
+                <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 20px;">
+                    Vous n'avez pas encore débloqué de badges. Continuez à lire pour en gagner !
+                </p>
+            <?php } ?>
         </div>
       </section>
 
@@ -347,127 +363,51 @@ $user = $_SESSION['user'];
         <h2 class="s-title reveal">Historique de Lecture.</h2>
 
         <div class="history-list">
+            <?php
+            // On fusionne les comics en cours et les comics finis pour l'historique
+            // On peut trier cet historique par date de dernière lecture si besoin
+            $historique_complet = array_merge($comics_en_cours, $comics_finis);
 
-          <div class="history-item reveal">
-            <img src="../../assets/img/spiderman.jpg" alt="Spider-Man #12" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Spider-Man #12</span>
-              <div class="history-meta">
-                <span>Page 24 / 32</span>
-                <span>22 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb" style="--pb-w: 75%"></div>
-            </div>
-            <span class="history-status active">En cours · 75%</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/Batman.jpg" alt="Batman: The Long Halloween" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Batman: The Long Halloween</span>
-              <div class="history-meta">
-                <span>32 pages</span>
-                <span>18 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb complete" style="--pb-w: 100%"></div>
-            </div>
-            <span class="history-status done">Terminé ✓</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/ironman.jpg" alt="Iron Man: Extremis" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Iron Man: Extremis</span>
-              <div class="history-meta">
-                <span>Page 12 / 48</span>
-                <span>15 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb" style="--pb-w: 25%"></div>
-            </div>
-            <span class="history-status active">En cours · 25%</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/xmen.jpg" alt="X-Men: Days of Future Past" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">X-Men: Days of Future Past</span>
-              <div class="history-meta">
-                <span>28 pages</span>
-                <span>10 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb complete" style="--pb-w: 100%"></div>
-            </div>
-            <span class="history-status done">Terminé ✓</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/superman.jpg" alt="Superman: Red Son" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Superman: Red Son</span>
-              <div class="history-meta">
-                <span>Page 20 / 40</span>
-                <span>6 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb" style="--pb-w: 50%"></div>
-            </div>
-            <span class="history-status active">En cours · 50%</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/Batman.jpg" alt="Batman: Year One" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Batman: Year One</span>
-              <div class="history-meta">
-                <span>36 pages</span>
-                <span>1 avr. 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb complete" style="--pb-w: 100%"></div>
-            </div>
-            <span class="history-status done">Terminé ✓</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/spiderman.jpg" alt="Spider-Man: Kraven's Last Hunt" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Spider-Man: Kraven's Last Hunt</span>
-              <div class="history-meta">
-                <span>44 pages</span>
-                <span>26 mars 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb complete" style="--pb-w: 100%"></div>
-            </div>
-            <span class="history-status done">Terminé ✓</span>
-          </div>
-
-          <div class="history-item reveal">
-            <img src="../../assets/img/ironman.jpg" alt="Iron Man: Armor Wars" class="history-cover">
-            <div class="history-info">
-              <span class="history-title">Iron Man: Armor Wars</span>
-              <div class="history-meta">
-                <span>Page 6 / 40</span>
-                <span>20 mars 2026</span>
-              </div>
-            </div>
-            <div class="history-pb-wrap">
-              <div class="history-pb" style="--pb-w: 15%"></div>
-            </div>
-            <span class="history-status active">Commencé · 15%</span>
-          </div>
-
+            // On trie l'historique par date de dernière lecture (du plus récent au plus ancien)
+            usort($historique_complet, function($a, $b) {
+                return strtotime($b['last_read_at']) - strtotime($a['last_read_at']);
+            });
+            
+            if (count($historique_complet) > 0) {
+                foreach ($historique_complet as $item) { 
+                    $progression = ($item['current_page'] / $item['total_pages']) * 100;
+                    // On s'assure que la progression est entre 0 et 100
+                    if ($progression > 100) { $progression = 100; }
+                    if ($progression < 0) { $progression = 0; }
+            ?>
+                    <div class="history-item reveal">
+                        <img src="../../assets/img/<?php echo htmlspecialchars($item['cover']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" class="history-cover">
+                        <div class="history-info">
+                            <span class="history-title"><?php echo htmlspecialchars($item['title']); ?></span>
+                            <div class="history-meta">
+                                <span>Page <?php echo $item['current_page']; ?> / <?php echo $item['total_pages']; ?></span>
+                                <span><?php echo date('d M. Y', strtotime($item['last_read_at'])); ?></span>
+                            </div>
+                        </div>
+                        <div class="history-pb-wrap">
+                            <div class="history-pb <?php if($item['completed'] == 1) { echo 'complete'; } ?>" style="--pb-w: <?php echo $progression; ?>%"></div>
+                        </div>
+                        <span class="history-status <?php if($item['completed'] == 1) { echo 'done'; } else { echo 'active'; } ?>">
+                            <?php 
+                            if($item['completed'] == 1) { 
+                                echo 'Terminé ✓'; 
+                            } else { 
+                                echo 'En cours · ' . round($progression) . '%'; 
+                            } 
+                            ?>
+                        </span>
+                    </div>
+                <?php 
+                }
+            } else { 
+            ?>
+                <p style="text-align: center; color: var(--muted); padding: 20px;">Aucune activité de lecture enregistrée pour le moment.</p>
+            <?php } ?>
         </div>
       </section>
 
@@ -478,82 +418,6 @@ $user = $_SESSION['user'];
     <a class="logo" href="#">Panel<em>Vault</em></a>
     <p>© 2025 PanelVault · Projet étudiant L1 Informatique</p>
   </footer>
-
-  <script src="../../js/javascript-index.js"></script>
-  <script>
-  (function () {
-
-    /* ── Anneau SVG ── */
-    const ring = document.querySelector('.ring-fg');
-    if (ring) {
-      const progress = parseFloat(ring.dataset.progress || '0');
-      setTimeout(() => { ring.style.strokeDashoffset = 390 * (1 - progress); }, 300);
-    }
-
-    /* ── Compteurs profil-stats-grid ── */
-    const profileGrid = document.querySelector('.profile-stats-grid');
-    if (profileGrid) {
-      let done = false;
-      new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !done) {
-          done = true;
-          profileGrid.querySelectorAll('.ctr').forEach(el => {
-            const target = parseInt(el.dataset.target, 10);
-            const start  = performance.now();
-            const dur    = 2000;
-            (function step(now) {
-              const p    = Math.min((now - start) / dur, 1);
-              const ease = 1 - Math.pow(1 - p, 4);
-              el.textContent = Math.floor(ease * target).toLocaleString('fr-FR');
-              if (p < 1) requestAnimationFrame(step);
-              else el.textContent = target.toLocaleString('fr-FR');
-            })(performance.now());
-          });
-        }
-      }, { threshold: 0.2 }).observe(profileGrid);
-    }
-
-    /* ── Barres de progression historique ── */
-    const histObserver = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          histObserver.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.history-item').forEach(el => histObserver.observe(el));
-
-    /* ── Calendrier de streak ── */
-    const grid = document.getElementById('streakGrid');
-    if (grid) {
-      const data = [
-        0,0,0,1,0,2,1,
-        0,1,1,0,2,1,0,
-        2,1,0,1,2,0,0,
-        0,0,2,3,1,2,1,
-        1,2,0,0,1,0,2,
-        2,1,3,2,1,0,1,
-        0,1,2,1,3,2,1,
-        2,3,1,2,3,2,1,
-        1,2,3,2,1,3,2,
-        3,2,3,1,2,3,2,
-        2,3,2,3,4,3,2,
-        3,4,3,4,3,4,3,
-        4,4,4,3,4,4,4
-      ];
-      data.forEach((level, i) => {
-        const day = document.createElement('div');
-        let cls = 'streak-day';
-        if (level > 0) cls += ` l${level}`;
-        if (i === data.length - 1) cls += ' today';
-        day.className = cls;
-        grid.appendChild(day);
-      });
-    }
-
-  })();
-  </script>
 
 </body>
 </html>

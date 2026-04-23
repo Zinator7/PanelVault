@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../php/db_connect.php';
-require_once '../../php/mvc/mvc_users/crud_users.php';
+include '../../php/db_connect.php';
+include '../../php/mvc/mvc_users/crud_users.php';
 $error ="";
 if(isset($_POST['email']) && isset($_POST['password'])) {
     $email = $_POST['email'];

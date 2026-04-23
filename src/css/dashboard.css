@@ -143,6 +143,81 @@
     color: var(--red) !important;
 }
 
+/* ═══ USER DROPDOWN (HEADER) ═══ */
+.user-dropdown-wrapper {
+    position: relative;
+    display: inline-block; /* Pour que le wrapper se comporte bien dans le flexbox du header */
+}
+
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 6px 12px; /* Ajuster le padding selon le design */
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+.user-trigger:hover {
+    background: rgba(240, 235, 225, 0.05);
+}
+
+.profile-avatar-mini {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.username-display {
+    color: var(--cream);
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px); /* Positionne le menu sous le déclencheur */
+    right: 0;
+    background: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 180px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 10px 0;
+    display: none; /* Caché par défaut, affiché par JS */
+    flex-direction: column;
+    z-index: 101;
+}
+
+.user-dropdown-menu a {
+    padding: 10px 15px;
+    color: var(--cream);
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown-menu a:hover {
+    background: rgba(240, 235, 225, 0.08);
+    color: var(--red);
+}
+
+.user-dropdown-menu hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 5px 0;
+}
+
 /* ═══ DASHBOARD CONTENT ═══ */
 .dashboard-content {
     flex-grow: 1;
@@ -384,6 +459,7 @@
     .user-profile .profile-avatar { width: 50px; height: 50px; font-size: 20px; margin-bottom: 0; }
     .user-profile .profile-name { font-size: 18px; }
     .user-profile .profile-level { display: none; } /* Cache le niveau sur mobile pour gagner de la place */
+    .user-profile .xp-bar-wrap, .user-profile .xp-next-level { display: none; } /* Cache la barre d'xp et le texte sur mobile */
     
     .profile-details { align-items: flex-start; }
     .xp-next-level { text-align: left; }
