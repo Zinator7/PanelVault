@@ -1,3 +1,15 @@
+<?php
+session_start();
+include '../../php/db_connect.php';
+include '../../php/mvc/mvc_users/crud_users.php';
+
+if(!isset($_SESSION['user'])){
+    header("Location: ../pages_connexion/login.php");
+    exit();
+}
+$user = $_SESSION['user'];
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -39,10 +51,10 @@
     <!-- ═══ SIDEBAR ═══ -->
     <aside class="dashboard-sidebar">
       <div class="user-profile">
-        <div class="profile-avatar">ZN</div>
+        <div class="profile-avatar"><?= strtoupper(substr($user['username'], 0, 2)) ?></div>
         <div class="profile-details">
-          <span class="profile-name">ZinatoR</span>
-          <span class="profile-level">Lvl. 28</span>
+          <span class="profile-name"><?= htmlspecialchars($user['username']) ?></span>
+          <span class="profile-level">Lvl. <?= $user['level'] ?? 1 ?></span>
           <div class="xp-bar-wrap">
             <div class="xp-bar" style="--xp-w: 68%"></div>
           </div>
@@ -95,17 +107,17 @@
 
         <!-- Avatar + ring -->
         <div class="profile-avatar-wrap">
-          <div class="profile-avatar-lg">ZN</div>
+          <div class="profile-avatar-lg"><?= strtoupper(substr($user['username'], 0, 2)) ?></div>
           <svg class="profile-ring" viewBox="0 0 136 136">
             <circle class="ring-bg" cx="68" cy="68" r="62"/>
             <circle class="ring-fg" cx="68" cy="68" r="62" data-progress="0.6824"/>
           </svg>
-          <span class="profile-level-badge">LVL 28</span>
+          <span class="profile-level-badge">LVL <?= $user['level'] ?? 1 ?></span>
         </div>
 
         <!-- Info -->
         <div class="profile-info">
-          <h1 class="profile-username">ZinatoR</h1>
+          <h1 class="profile-username"><?= htmlspecialchars($user['username']) ?></h1>
           <p class="profile-tagline">Lecteur passionné · Collectionneur de scans rares · Membre depuis le 12 janv. 2025</p>
           <div class="profile-pills">
             <span class="profile-pill accent">🔥 7 jours de streak</span>

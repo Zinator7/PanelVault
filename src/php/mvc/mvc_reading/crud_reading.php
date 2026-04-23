@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+include '../../db_connect.php';
 
 function insert_progress($conn, $user_id, $comic_id, $current_page, $total_pages) {
     $user_id      = (int) $user_id;

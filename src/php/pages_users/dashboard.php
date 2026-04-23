@@ -1,3 +1,15 @@
+<?php
+session_start();
+include '../../php/db_connect.php';
+include '../../php/mvc/mvc_users/crud_users.php';
+
+if(!isset($_SESSION['user'])){
+    header("Location: ../pages_connexion/login.php");
+    exit();
+}
+$user = $_SESSION['user'];
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,10 +49,10 @@
         <!-- Sidebar -->
         <aside class="dashboard-sidebar">
             <div class="user-profile">
-                <div class="profile-avatar">ZN</div>
+                <div class="profile-avatar"><?= strtoupper(substr($user['username'], 0, 2)) ?></div>
                 <div class="profile-details">
-                    <span class="profile-name">ZinatoR</span>
-                    <span class="profile-level">Lvl. 28</span>
+                    <span class="profile-name"><?= htmlspecialchars($user['username']) ?></span>
+                    <span class="profile-level">Lvl. <?= $user['level'] ?? 1 ?></span>
                     <div class="xp-bar-wrap">
                         <div class="xp-bar" style="--xp-w: 68%"></div>
                     </div>

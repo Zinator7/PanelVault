@@ -1,3 +1,8 @@
+<?php
+include '../../php/db_connect.php';
+
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

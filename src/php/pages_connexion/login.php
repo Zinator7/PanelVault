@@ -1,3 +1,24 @@
+<?php
+session_start();
+require_once '../../php/db_connect.php';
+require_once '../../php/mvc/mvc_users/crud_users.php';
+$error ="";
+if(isset($_POST['email']) && isset($_POST['password'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    $user = login_user($conn, $email, $password);
+    if($user) {
+        $_SESSION['user'] = $user;
+        header("Location: ../pages_users/profil.php");
+        exit();
+    }else{
+        $error = "Connexion Impossible";
+    }
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -28,6 +49,11 @@
             <div class="auth-ghost-num">01</div>
             <div class="auth-eyebrow">Ravi de te revoir</div>
             <h1 class="auth-title">Connexion</h1>
+            <?php if ($error): ?>
+                <div style="color: var(--red); background: rgba(232, 50, 47, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; border: 1px solid var(--red);">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
             <form class="auth-form" action="#" method="POST">
                 <div class="field">
                     <label for="email">Email</label>

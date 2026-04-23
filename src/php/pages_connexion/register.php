@@ -1,3 +1,23 @@
+<?php
+include '../../php/db_connect.php';
+include '../../php/mvc/mvc_users/crud_users.php';
+$error ="";
+if(isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
+    $email    = $_POST['email'];
+    $password = $_POST['password'];
+
+    $creer = insert_user($conn, $username, $email, $password);
+    if($creer) {
+        header("Location: login.php");
+        exit();
+    } else {
+        $error = "Erreur lors de l'inscription (cet email est peut-être déjà utilisé).";
+    }
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -28,6 +48,13 @@
             <div class="auth-ghost-num">02</div>
             <div class="auth-eyebrow">Rejoins-nous</div>
             <h1 class="auth-title">Inscription</h1>
+
+            <?php if ($error): ?>
+                <div style="color: var(--red); background: rgba(232, 50, 47, 0.1); padding: 10px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; border: 1px solid var(--red);">
+                    <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
+
             <form class="auth-form" action="#" method="POST">
                 <div class="field">
                     <label for="username">Pseudo</label>

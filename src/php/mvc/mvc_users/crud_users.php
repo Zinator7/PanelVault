@@ -1,91 +1,50 @@
 <?php
-require_once 'db.php';
-
-/**
- * CRUD — TABLE users
- */
-
+include '../../db_connect.php';
 function insert_user($conn, $username, $email, $password) {
-    // On échappe les données pour éviter les injections SQL
     $username = mysqli_real_escape_string($conn, $username);
     $email    = mysqli_real_escape_string($conn, $email);
     $hash     = password_hash($password, PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO `users` (`username`, `email`, `password`) 
-            VALUES ('$username', '$email', '$hash')";
-
-    global $debug;
-    if ($debug) echo $sql;
-
-    $res = mysqli_query($conn, $sql);
-    return $res;
+    $sql = "INSERT INTO `users` (`username`, `email`, `password`) VALUES ('$username', '$email', '$hash')";
+    return mysqli_query($conn, $sql);
 }
 
 function select_user($conn, $id) {
-    $id  = mysqli_real_escape_string($conn, $id);
-    $sql = "SELECT * FROM `users` WHERE id = '$id'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
+    $id  = (int) $id;
+    $sql = "SELECT * FROM `users` WHERE id = $id";
     $res = mysqli_query($conn, $sql);
-    $tab = rs_to_tab($res);
-    return $tab[0];
+    return mysqli_fetch_assoc($res);
 }
 
 function select_user_by_email($conn, $email) {
     $email = mysqli_real_escape_string($conn, $email);
     $sql   = "SELECT * FROM `users` WHERE email = '$email'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
-    $res = mysqli_query($conn, $sql);
-    $tab = rs_to_tab($res);
-    return isset($tab[0]) ? $tab[0] : false;
+    $res   = mysqli_query($conn, $sql);
+    return mysqli_fetch_assoc($res);
 }
 
 function list_users($conn) {
-    $sql = "SELECT id, username, avatar, level, xp, points, streak 
-            FROM `users` 
-            ORDER BY points DESC";
-
-    global $debug;
-    if ($debug) echo $sql;
-
+    $sql = "SELECT id, username, avatar, level, xp, points, streak FROM `users` ORDER BY points DESC";
     $res = mysqli_query($conn, $sql);
-    return rs_to_tab($res);
+    $tab = [];
+    while ($row = mysqli_fetch_assoc($res)) $tab[] = $row;
+    return $tab;
 }
 
 function update_user($conn, $id, $username, $avatar) {
-    $id       = mysqli_real_escape_string($conn, $id);
+    $id       = (int) $id;
     $username = mysqli_real_escape_string($conn, $username);
     $avatar   = mysqli_real_escape_string($conn, $avatar);
-
-    $sql = "UPDATE `users` SET `username`='$username', `avatar`='$avatar' 
-            WHERE id = '$id'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
-    $res = mysqli_query($conn, $sql);
-    return $res;
+    $sql      = "UPDATE `users` SET `username`='$username', `avatar`='$avatar' WHERE id = $id";
+    return mysqli_query($conn, $sql);
 }
 
 function update_xp_points($conn, $id, $xp, $points) {
-    $id     = mysqli_real_escape_string($conn, $id);
+    $id     = (int) $id;
     $xp     = (int) $xp;
     $points = (int) $points;
-
-    $sql = "UPDATE `users` 
-            SET `xp` = xp + $xp, `points` = points + $points 
-            WHERE id = '$id'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
-    $res = mysqli_query($conn, $sql);
-    return $res;
+    $sql    = "UPDATE `users` SET `xp` = xp + $xp, `points` = points + $points WHERE id = $id";
+    return mysqli_query($conn, $sql);
 }
 
 function update_streak($conn, $id) {
@@ -93,48 +52,25 @@ function update_streak($conn, $id) {
     if (!$user) return false;
 
     $today     = date('Y-m-d');
-    $lastRead  = $user['last_read'];
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
     $streak    = (int) $user['streak'];
     $streakMax = (int) $user['streak_max'];
 
-    // Déjà lu aujourd'hui
-    if ($lastRead === $today) return true;
-
-    // Lu hier → on continue
-    $yesterday = date('Y-m-d', strtotime('-1 day'));
-    if ($lastRead === $yesterday) {
-        $streak++;
-    } else {
-        $streak = 1; // streak cassé
-    }
-
+    if ($user['last_read'] === $today) return true;
+    $streak = ($user['last_read'] === $yesterday) ? $streak + 1 : 1;
     $streakMax = max($streak, $streakMax);
-    $id        = mysqli_real_escape_string($conn, $id);
 
-    $sql = "UPDATE `users` 
-            SET `streak`=$streak, `streak_max`=$streakMax, `last_read`='$today' 
-            WHERE id = '$id'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
+    $id  = (int) $id;
+    $sql = "UPDATE `users` SET `streak`=$streak, `streak_max`=$streakMax, `last_read`='$today' WHERE id = $id";
     return mysqli_query($conn, $sql);
 }
 
 function delete_user($conn, $id) {
-    $id  = mysqli_real_escape_string($conn, $id);
-    $sql = "DELETE FROM `users` WHERE id = '$id'";
-
-    global $debug;
-    if ($debug) echo $sql;
-
-    $res = mysqli_query($conn, $sql);
-    return $res;
+    $id  = (int) $id;
+    $sql = "DELETE FROM `users` WHERE id = $id";
+    return mysqli_query($conn, $sql);
 }
 
-/**
- * Connexion : vérifie email + mot de passe
- */
 function login_user($conn, $email, $password) {
     $user = select_user_by_email($conn, $email);
     if (!$user) return false;
