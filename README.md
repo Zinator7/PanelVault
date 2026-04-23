@@ -1,4 +1,4 @@
-# 📖 Inkdex
+# 📖 PanelVault
 
 > Un lecteur de scans de comics dynamique avec profils, classements, streaks et badges.
 
