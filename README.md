@@ -23,8 +23,6 @@
 | Backend | LocalStorage (pas de base de données) | ou phpmyadmin
 | Lecture | FileReader API (import local) | ou autre...
 
-> Inkdex est un **viewer client-side uniquement** — aucun scan n'est stocké sur un serveur.
-
 ---
 
 ## 🚀 Lancer le projet
