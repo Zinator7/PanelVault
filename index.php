@@ -2,8 +2,8 @@
 // On démarre la session pour récupérer les infos de l'utilisateur connecté
 session_start();
 // On inclut les fichiers nécessaires (Base de données et CRUD)
-include '../../php/db_connect.php';
-include '../../php/mvc/mvc_users/crud_users.php';
+include 'src/php/db_connect.php';
+include 'src/php/mvc/mvc_users/crud_users.php';
 
 // On récupère l'utilisateur en session s'il est connecté
 

@@ -121,6 +121,24 @@ $nb_lus = count($comics_finis);
     </div>
   </header>
 
+  <!-- MENU MOBILE -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../../../index.php#features" onclick="closeMenu()">Fonctionnalités</a>
+    <a href="../../../index.php#how" onclick="closeMenu()">Comment ça marche</a>
+    <a href="../../../leaderboard.php">Classement</a>
+    <hr style="border-color:var(--border);border-width:0.5px;"/>
+    <?php if (isset($_SESSION['user']) == true) { ?>
+        <a href="profil.php" class="mm-ghost">Mon Profil</a>
+        <a href="dashboard.php" class="mm-ghost">Dashboard</a>
+        <a href="#" class="mm-ghost">Paramètres</a>
+        <hr style="border-color:var(--border);border-width:0.5px;"/>
+        <a href="../pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
+    <?php } else { ?>
+        <a href="../pages_connexion/login.php" class="mm-ghost">Connexion</a>
+        <a href="../pages_connexion/register.php" class="mm-red">S'inscrire →</a>
+    <?php } ?>
+  </div>
+
   <main class="dashboard-layout">
 
     <!-- ═══ SIDEBAR ═══ -->

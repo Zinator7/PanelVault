@@ -130,8 +130,16 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
         <a href="../../../index.php#how" onclick="closeMenu()">Comment ça marche</a>
         <a href="../../../leaderboard.php">Classement</a>
         <hr style="border-color:var(--border);border-width:0.5px;"/>
-        <a href="../pages_connexion/login.php" class="mm-ghost">Connexion</a>
-        <a href="../pages_connexion/register.php" class="mm-red">S'inscrire →</a>
+        <?php if (isset($_SESSION['user']) == true) { ?>
+            <a href="profil.php" class="mm-ghost">Mon Profil</a>
+            <a href="dashboard.php" class="mm-ghost">Dashboard</a>
+            <a href="#" class="mm-ghost">Paramètres</a>
+            <hr style="border-color:var(--border);border-width:0.5px;"/>
+            <a href="../pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
+        <?php } else { ?>
+            <a href="../pages_connexion/login.php" class="mm-ghost">Connexion</a>
+            <a href="../pages_connexion/register.php" class="mm-red">S'inscrire →</a>
+        <?php } ?>
     </div>
 
     <main class="dashboard-layout">
@@ -230,7 +238,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                     <?php } else { ?>
                         <div class="stat-card" style="grid-column: 1 / -1; padding: 40px;">
                             <p style="color: var(--muted);">Vous n'avez aucune lecture en cours pour le moment.</p>
-                            <a href="#" class="btn btn-red" style="margin-top: 15px;">Parcourir le catalogue →</a>
+                            <a href="#" class="btn btn-red" style="margin-top: 15px;">Uploader votre scan →</a>
                         </div>
                     <?php } ?>
                 </div>

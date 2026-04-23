@@ -568,7 +568,7 @@ footer p { font-size: 12px; color: rgba(240,235,225,.2); }
 .mobile-menu {
   display: none;
   position: fixed;
-  top: 57px; left: 0; right: 0;
+  top: 60px; left: 0; right: 0;
   background: rgba(13,12,11,0.97);
   backdrop-filter: blur(16px);
   z-index: 99;
@@ -659,6 +659,7 @@ footer p { font-size: 12px; color: rgba(240,235,225,.2); }
   header { padding: 16px 20px; }
   nav { display: none; }
   .btn-ghost { display: none; }
+  .user-dropdown-wrapper { display: block; }
 
   .hero { min-height: 100svh; }
   .covers { grid-template-columns: repeat(3, 1fr); }
