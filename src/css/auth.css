@@ -1,0 +1,207 @@
+/* ═══ AUTH LAYOUT ═══ */
+.auth-wrap {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 24px 60px;
+}
+
+/* ═══ BACKGROUND PANELS ═══ */
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+}
+
+.auth-bg-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.ab1 {
+  background:
+    linear-gradient(to top, rgba(13,12,11,0.6) 0%, transparent 60%),
+    url('../../assets/img/Batman.jpg') center top / cover no-repeat;
+}
+.ab2 {
+  background:
+    linear-gradient(to top, rgba(13,12,11,0.6) 0%, transparent 60%),
+    url('../../assets/img/ironman.jpg') center top / cover no-repeat;
+}
+.ab3 {
+  background:
+    linear-gradient(to top, rgba(13,12,11,0.6) 0%, transparent 60%),
+    url('../../assets/img/spiderman.jpg') center top / cover no-repeat;
+}
+
+.auth-bg-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, #0D0C0B 20%, rgba(13,12,11,0.72) 60%, rgba(13,12,11,0.45) 100%),
+    linear-gradient(to right, rgba(13,12,11,0.5) 0%, transparent 30%, transparent 70%, rgba(13,12,11,0.5) 100%);
+  z-index: 1;
+}
+
+/* ═══ CARD ═══ */
+.auth-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(17,16,16,0.88);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 48px 40px;
+  backdrop-filter: blur(24px);
+  overflow: hidden;
+}
+
+.auth-ghost-num {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 140px;
+  letter-spacing: -6px;
+  color: rgba(240,235,225,.035);
+  line-height: 1;
+  position: absolute;
+  top: -24px;
+  right: -8px;
+  user-select: none;
+  pointer-events: none;
+}
+
+.auth-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 12px;
+}
+
+.auth-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  letter-spacing: -2px;
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+  color: var(--cream);
+}
+
+/* ═══ FORM ═══ */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field input {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  color: var(--cream);
+  background: rgba(240,235,225,0.04);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .2s, background .2s;
+  width: 100%;
+}
+
+.field input::placeholder { color: rgba(240,235,225,0.2); }
+
+.field input:focus {
+  border-color: rgba(240,235,225,0.18);
+  background: rgba(240,235,225,0.06);
+}
+
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+  font-size: 14px;
+  padding: 13px 20px;
+  cursor: pointer;
+}
+
+/* ═══ DIVIDER & LINK ═══ */
+.auth-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 28px 0 20px;
+}
+
+.auth-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.auth-link a {
+  color: var(--cream);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color .2s;
+}
+
+.auth-link a:hover { color: var(--red); }
+
+/* ═══ RED ACCENT BAR on card top ═══ */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+  .auth-bg { grid-template-columns: 1fr 1fr; }
+  .ab3 { display: none; }
+  .auth-card { padding: 36px 24px; }
+  .auth-title { font-size: 36px; }
+  .auth-ghost-num { font-size: 110px; }
+}
+
+@media (max-width: 480px) {
+  .auth-wrap { padding: 100px 16px 48px; }
+  .auth-bg { grid-template-columns: 1fr; }
+  .ab2, .ab3 { display: none; }
+  .auth-card { padding: 32px 20px; }
+  .auth-title { font-size: 32px; }
+}
