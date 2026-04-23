@@ -1,20 +1,26 @@
 /* Burger menu */
 const burger = document.getElementById('burger');
 const mobileMenu = document.getElementById('mobileMenu');
-burger.addEventListener('click', () => {
-  burger.classList.toggle('open');
-  mobileMenu.classList.toggle('open');
-});
+
+if (burger && mobileMenu) {
+  burger.addEventListener('click', () => {
+    burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+}
+
 function closeMenu() {
-  burger.classList.remove('open');
-  mobileMenu.classList.remove('open');
+  if (burger) burger.classList.remove('open');
+  if (mobileMenu) mobileMenu.classList.remove('open');
 }
 
 /* Header scroll */
 const hdr = document.getElementById('hdr');
-window.addEventListener('scroll', () => {
-  hdr.classList.toggle('scrolled', window.scrollY > 40);
-});
+if (hdr) {
+  window.addEventListener('scroll', () => {
+    hdr.classList.toggle('scrolled', window.scrollY > 40);
+  });
+}
 
 /* Compteurs animés */
 function animateCounter(el) {

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classement — PanelVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="src/css/style.css">
+    <link rel="stylesheet" href="src/css/leaderboard.css">
+</head>
+<body>
+    <header id="hdr">
+        <a class="logo" href="index.html">Panel<em>Vault</em></a>
+        <nav>
+            <a href="index.html#features">Fonctionnalités</a>
+            <a href="index.html#how">Comment ça marche</a>
+            <a href="leaderboard.html">Classement</a>
+        </nav>
+        <div class="h-btns">
+            <a href="src/php/pages_connexion/login.html" class="btn btn-ghost">Connexion</a>
+            <a href="src/php/pages_connexion/register.html" class="btn btn-red">S'inscrire</a>
+            <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+        </div>
+    </header>
+
+    <!-- MENU MOBILE -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html#features" onclick="closeMenu()">Fonctionnalités</a>
+        <a href="index.html#how" onclick="closeMenu()">Comment ça marche</a>
+        <a href="leaderboard.html" onclick="closeMenu()">Classement</a>
+        <hr style="border-color:var(--border);border-width:0.5px;"/>
+        <a href="src/php/pages_connexion/login.html" class="mm-ghost">Connexion</a>
+        <a href="src/php/pages_connexion/register.html" class="mm-red">S'inscrire →</a>
+    </div>
+
+    <main class="leaderboard-page">
+        <section class="section">
+            <p class="s-eyebrow reveal">Communauté</p>
+            <h1 class="s-title reveal">Le Panthéon des<br>Collectionneurs.</h1>
+
+            <!-- PODIUM (Top 3) -->
+            <div class="podium reveal">
+                <!-- 2nd -->
+                <div class="podium-item rank-2">
+                    <div class="avatar-wrap">
+                        <div class="avatar-placeholder">MT</div>
+                        <div class="badge">2</div>
+                    </div>
+                    <div class="podium-info">
+                        <span class="p-name">MagnetoFan</span>
+                        <span class="p-xp">14,200 XP</span>
+                    </div>
+                    <div class="step"></div>
+                </div>
+                <!-- 1st -->
+                <div class="podium-item rank-1">
+                    <div class="avatar-wrap">
+                        <div class="avatar-placeholder gold">PV</div>
+                        <div class="badge-crown">👑</div>
+                    </div>
+                    <div class="podium-info">
+                        <span class="p-name">PeterParker99</span>
+                        <span class="p-xp">18,540 XP</span>
+                    </div>
+                    <div class="step"></div>
+                </div>
+                <!-- 3rd -->
+                <div class="podium-item rank-3">
+                    <div class="avatar-wrap">
+                        <div class="avatar-placeholder">WK</div>
+                        <div class="badge">3</div>
+                    </div>
+                    <div class="podium-info">
+                        <span class="p-name">WadeWilson</span>
+                        <span class="p-xp">12,100 XP</span>
+                    </div>
+                    <div class="step"></div>
+                </div>
+            </div>
+
+            <!-- LISTE COMPLÈTE -->
+            <div class="leader-list reveal">
+                <div class="list-header">
+                    <span>Rang</span>
+                    <span>Utilisateur</span>
+                    <span class="m-hide">Niveau</span>
+                    <span>Comics lus</span>
+                    <span>Total XP</span>
+                </div>
+
+                <!-- Template Row (à boucler en PHP) -->
+                <div class="list-row">
+                    <span class="r-rank">04</span>
+                    <span class="r-user">Bruce_W</span>
+                    <span class="r-lvl m-hide">Lvl. 42</span>
+                    <span class="r-count">156</span>
+                    <span class="r-xp">9,820</span>
+                </div>
+                
+                <div class="list-row">
+                    <span class="r-rank">05</span>
+                    <span class="r-user">TonyStark</span>
+                    <span class="r-lvl m-hide">Lvl. 38</span>
+                    <span class="r-count">142</span>
+                    <span class="r-xp">8,450</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">06</span>
+                    <span class="r-user">Diana_Pr</span>
+                    <span class="r-lvl m-hide">Lvl. 35</span>
+                    <span class="r-count">130</span>
+                    <span class="r-xp">7,900</span>
+                </div>
+
+                <!-- Exemple de ligne "Utilisateur Connecté" -->
+                <div class="list-row is-me">
+                    <span class="r-rank">07</span>
+                    <span class="r-user">Toi (ZinatoR)</span>
+                    <span class="r-lvl m-hide">Lvl. 28</span>
+                    <span class="r-count">94</span>
+                    <span class="r-xp">6,210</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">08</span>
+                    <span class="r-user">Logan_X</span>
+                    <span class="r-lvl m-hide">Lvl. 25</span>
+                    <span class="r-count">88</span>
+                    <span class="r-xp">5,900</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">09</span>
+                    <span class="r-user">Arthur_Curry</span>
+                    <span class="r-lvl m-hide">Lvl. 22</span>
+                    <span class="r-count">72</span>
+                    <span class="r-xp">4,850</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">10</span>
+                    <span class="r-user">Barry_Allen</span>
+                    <span class="r-lvl m-hide">Lvl. 21</span>
+                    <span class="r-count">65</span>
+                    <span class="r-xp">4,100</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">11</span>
+                    <span class="r-user">Clark_K</span>
+                    <span class="r-lvl m-hide">Lvl. 19</span>
+                    <span class="r-count">58</span>
+                    <span class="r-xp">3,850</span>
+                </div>
+
+                <div class="list-row">
+                    <span class="r-rank">12</span>
+                    <span class="r-user">Hal_Jordan</span>
+                    <span class="r-lvl m-hide">Lvl. 15</span>
+                    <span class="r-count">42</span>
+                    <span class="r-xp">2,900</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <a class="logo" href="#">Panel<em>Vault</em></a>
+        <p>© 2025 PanelVault · Projet étudiant L1 Informatique</p>
+    </footer>
+
+    <script src="src/js/javascript-index.js"></script>
+</body>
+</html>
