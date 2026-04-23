@@ -110,6 +110,9 @@ nav a:hover { color: var(--cream); }
   display: grid;
   grid-template-columns: 1.1fr 0.85fr 1fr 0.9fr 1.15fr;
   gap: 3px;
+  transform: scale(1.04);
+  will-change: transform;
+  transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .cover {
@@ -162,6 +165,19 @@ nav a:hover { color: var(--cream); }
   background: linear-gradient(to top, rgba(13,12,11,0.5) 0%, transparent 60%),
               url('../assets/img/superman.jpg') center top / cover no-repeat;
 }
+
+/* Ken Burns — zoom lent alterné par colonne */
+@keyframes kb1 { 0% { transform: scale(1)    translate(0, 0);         } 100% { transform: scale(1.07) translate(-1%,  -0.5%); } }
+@keyframes kb2 { 0% { transform: scale(1.05) translate(0.5%,  0);     } 100% { transform: scale(1)    translate(0,      0.5%); } }
+@keyframes kb3 { 0% { transform: scale(1)    translate(0,   -0.5%);   } 100% { transform: scale(1.06) translate(0.5%,  0.5%); } }
+@keyframes kb4 { 0% { transform: scale(1.04) translate(-0.5%, 0.5%);  } 100% { transform: scale(1)    translate(0,     -0.5%); } }
+@keyframes kb5 { 0% { transform: scale(1)    translate(0.5%,  0);     } 100% { transform: scale(1.07) translate(-0.5%, -0.5%); } }
+
+.c1 .cover-art { animation: kb1 18s ease-in-out infinite alternate; }
+.c2 .cover-art { animation: kb2 22s ease-in-out infinite alternate; animation-delay: -6s; }
+.c3 .cover-art { animation: kb3 20s ease-in-out infinite alternate; animation-delay: -10s; }
+.c4 .cover-art { animation: kb4 25s ease-in-out infinite alternate; animation-delay: -3s; }
+.c5 .cover-art { animation: kb5 19s ease-in-out infinite alternate; animation-delay: -8s; }
 
 /* Silhouettes SVG dans les covers */
 .cover-silhouette {
@@ -335,6 +351,7 @@ nav a:hover { color: var(--cream); }
   font-size: 10px;
   opacity: 0.7;
 }
+.band:hover .band-inner { animation-play-state: paused; }
 
 /* ═══ SECTION COMMUNE ═══ */
 .section {
@@ -404,7 +421,8 @@ nav a:hover { color: var(--cream); }
   line-height: 1;
   margin-bottom: 20px;
 }
-.f-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+.f-icon { font-size: 28px; margin-bottom: 14px; display: block; transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.feat:hover .f-icon { transform: scale(1.22); }
 .f-name {
   font-family: 'Big Shoulders Display', sans-serif;
   font-weight: 900;
@@ -434,7 +452,11 @@ nav a:hover { color: var(--cream); }
   width: 32px; height: 2px;
   background: var(--red);
   margin-bottom: 16px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
 }
+.reveal.visible .step-line { transform: scaleX(1); }
 .step-t {
   font-family: 'Big Shoulders Display', sans-serif;
   font-weight: 900;
@@ -591,6 +613,32 @@ footer p { font-size: 12px; color: rgba(240,235,225,.2); }
 /* ═══ REVEAL ═══ */
 .reveal { opacity:0; transform:translateY(32px); transition: opacity .7s ease, transform .7s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ═══ SCROLL PROGRESS BAR ═══ */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: var(--red);
+  width: 0%;
+  z-index: 200;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(232, 50, 47, 0.55);
+  transition: width 0.1s linear;
+}
+
+/* Stagger feat-grid */
+.feat-grid .feat:nth-child(1) { transition-delay: 0.04s; }
+.feat-grid .feat:nth-child(2) { transition-delay: 0.11s; }
+.feat-grid .feat:nth-child(3) { transition-delay: 0.18s; }
+.feat-grid .feat:nth-child(4) { transition-delay: 0.25s; }
+.feat-grid .feat:nth-child(5) { transition-delay: 0.32s; }
+.feat-grid .feat:nth-child(6) { transition-delay: 0.39s; }
+
+/* Stagger steps */
+.steps-row > div:nth-child(1) { transition-delay: 0.04s; }
+.steps-row > div:nth-child(2) { transition-delay: 0.20s; }
+.steps-row > div:nth-child(3) { transition-delay: 0.36s; }
 
 /* ═══ RESPONSIVE ═══ */
 

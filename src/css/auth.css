@@ -176,8 +176,9 @@
 .field input::placeholder { color: rgba(240,235,225,0.2); }
 
 .field input:focus {
-  border-color: rgba(240,235,225,0.18);
+  border-color: rgba(232, 50, 47, 0.5);
   background: rgba(240,235,225,0.06);
+  box-shadow: 0 0 0 3px rgba(232, 50, 47, 0.08);
 }
 
 .btn-full {
@@ -190,6 +191,16 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
+  transition: background .2s, transform .15s, box-shadow .2s;
+}
+.btn-full:hover {
+  background: #cc2a27;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(232, 50, 47, 0.35);
+}
+.btn-full:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 /* ═══ DIVIDER & LINK ═══ */
@@ -212,7 +223,7 @@
   transition: color .2s;
 }
 
-.auth-link a:hover { color: var(--red); }
+.auth-link a:hover { color: var(--red); text-decoration: underline; }
 
 /* ═══ RED ACCENT BAR on card top ═══ */
 .auth-card::before {
