@@ -1,5 +1,5 @@
 <?php
-include '../../db_connect.php';
+include_once __DIR__ . '/../../db_connect.php';
 
 function insert_comic($conn, $user_id, $title, $publisher, $cover, $total_pages, $file_path = null, $file_type = null) {
     $user_id     = (int) $user_id;
@@ -19,6 +19,7 @@ function select_comic($conn, $id) {
     $id  = (int) $id;
     $sql = "SELECT c.*, u.username as uploader FROM `comics` c JOIN `users` u ON c.user_id = u.id WHERE c.id = $id";
     $res = mysqli_query($conn, $sql);
+    if (!$res) return null;
     return mysqli_fetch_assoc($res);
 }
 
@@ -26,6 +27,7 @@ function list_comics($conn) {
     $sql = "SELECT c.*, u.username as uploader FROM `comics` c JOIN `users` u ON c.user_id = u.id ORDER BY c.uploaded_at DESC";
     $res = mysqli_query($conn, $sql);
     $tab = [];
+    if (!$res) return $tab;
     while ($row = mysqli_fetch_assoc($res)) $tab[] = $row;
     return $tab;
 }
@@ -35,6 +37,7 @@ function list_comics_by_user($conn, $user_id) {
     $sql     = "SELECT * FROM `comics` WHERE user_id = $user_id ORDER BY uploaded_at DESC";
     $res     = mysqli_query($conn, $sql);
     $tab     = [];
+    if (!$res) return $tab;
     while ($row = mysqli_fetch_assoc($res)) $tab[] = $row;
     return $tab;
 }
@@ -71,4 +74,3 @@ function delete_comic($conn, $id) {
     $sql = "DELETE FROM `comics` WHERE id = $id";
     return mysqli_query($conn, $sql);
 }
-?>

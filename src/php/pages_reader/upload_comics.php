@@ -13,9 +13,9 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-include '../db_connect.php';
-include '../mvc/mvc_users/crud_users.php';
-include '../mvc/mvc_comics/crud_comics.php';
+include __DIR__ . '/../db_connect.php';
+include __DIR__ . '/../mvc/mvc_users/crud_users.php';
+include __DIR__ . '/../mvc/mvc_comics/crud_comics.php';
 
 $user    = select_user($conn, $_SESSION['user']['id']);
 $user_id = $user['id'];
@@ -26,11 +26,22 @@ $xp_par_palier  = 1000;
 $xp_dans_niveau = $xp_totale - (($niveau - 1) * $xp_par_palier);
 $pourcentage_xp = max(0, min(100, ($xp_dans_niveau / $xp_par_palier) * 100));
 
+// Initialisation de sécurité pour éviter l'écran noir si le script saute au rendu
+$mes_uploads = list_comics_by_user($conn, $user_id);
+$editeurs_connus = ['Marvel', 'DC Comics', 'Image Comics', 'Dark Horse', 'IDW Publishing', 'Boom! Studios', 'Vertigo', 'Manga', 'Autre'];
+
 $flash_type = '';
 $flash_msg  = '';
 
 // ─── TRAITEMENT POST ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Sécurité : Si le fichier dépasse post_max_size, $_POST et $_FILES sont vides
+    if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+        $flash_type = 'error';
+        $flash_msg  = 'Le fichier est trop lourd pour le serveur (Limite actuelle : 128 Mo).';
+        goto render; // Saute directement à l'affichage pour éviter les erreurs de variables vides
+    }
 
     $title       = trim($_POST['title']       ?? '');
     $publisher   = trim($_POST['publisher']   ?? '');
@@ -154,13 +165,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+render: // Point d'étiquette pour la gestion d'erreur critique
+
 if (isset($_GET['uploaded'])) {
     $flash_type = 'success';
     $flash_msg  = 'Scan ajouté avec succès à la bibliothèque !';
 }
-
-$mes_uploads   = list_comics_by_user($conn, $user_id);
-$editeurs_connus = ['Marvel', 'DC Comics', 'Image Comics', 'Dark Horse', 'IDW Publishing', 'Boom! Studios', 'Vertigo', 'Manga', 'Autre'];
 ?>
 <!DOCTYPE html>
 <html lang="fr">

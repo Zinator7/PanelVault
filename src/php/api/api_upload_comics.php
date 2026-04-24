@@ -8,25 +8,12 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-// Vérification de la taille via Content-Length si $_FILES est vide
-if (empty($_FILES) && empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
-    echo json_encode(['error' => 'Le fichier dépasse la limite autorisée par le serveur.']);
+if (!isset($_FILES['comic_file']) && !isset($_FILES['scan_file'])) { 
+    echo json_encode(['error' => 'Aucun fichier reçu']);
     exit();
 }
 
-if (!isset($_FILES['comic_file'])) { 
-    echo json_encode(['error' => 'Aucun fichier de scan n\'a été envoyé.']); 
-    exit(); 
-}
-
-if ($_FILES['comic_file']['error'] !== 0) {
-    $errCodes = [1 => 'Fichier trop lourd (php.ini)', 2 => 'Fichier trop lourd (HTML)', 3 => 'Upload partiel', 4 => 'Aucun fichier'];
-    $msg = $errCodes[$_FILES['comic_file']['error']] ?? 'Erreur inconnue';
-    echo json_encode(['error' => 'Erreur upload : ' . $msg]); 
-    exit(); 
-}
-
-$file = $_FILES['comic_file'];
+$file = $_FILES['comic_file'] ?? $_FILES['scan_file'];
 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 $allowed = ['pdf', 'epub', 'cbz', 'zip', 'jpg', 'png', 'webp'];
 
@@ -42,23 +29,13 @@ $uploadDir = '../../uploads/comics/';
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
 
 if (move_uploaded_file($file['tmp_name'], $uploadDir . $newName)) {
-    // Gestion de la couverture si fournie
-    $coverName = "";
-    if (isset($_FILES['cover_file']) && $_FILES['cover_file']['error'] === 0) {
-        $cExt = strtolower(pathinfo($_FILES['cover_file']['name'], PATHINFO_EXTENSION));
-        if (in_array($cExt, ['jpg', 'jpeg', 'png', 'webp'])) {
-            $coverName = uniqid('cover_') . '.' . $cExt;
-            move_uploaded_file($_FILES['cover_file']['tmp_name'], '../../assets/img/' . $coverName);
-        }
-    }
-
-    $title = mysqli_real_escape_string($conn, $_POST['title'] ?? pathinfo($file['name'], PATHINFO_FILENAME));
-    $publisher = mysqli_real_escape_string($conn, $_POST['publisher'] ?? '');
+    $title = mysqli_real_escape_string($conn, pathinfo($file['name'], PATHINFO_FILENAME));
     $userId = (int)$_SESSION['user']['id'];
     $totalPages = isset($_POST['total_pages']) ? (int)$_POST['total_pages'] : 0;
     
-    $sql = "INSERT INTO comics (title, publisher, cover, file_path, file_type, user_id, total_pages, created_at) 
-            VALUES ('$title', '$publisher', '$coverName', '$newName', '$ext', $userId, $totalPages, NOW())";
+    // On insère en base. Note: tu devras peut-être adapter tes colonnes (ex: file_path)
+    $sql = "INSERT INTO comics (title, file_path, file_type, user_id, total_pages, created_at) 
+            VALUES ('$title', '$newName', '$ext', $userId, $totalPages, NOW())";
     
     if (mysqli_query($conn, $sql)) {
         echo json_encode(['success' => true]);

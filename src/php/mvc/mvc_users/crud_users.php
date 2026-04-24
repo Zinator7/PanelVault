@@ -1,5 +1,5 @@
 <?php
-include '../../db_connect.php';
+include_once __DIR__ . '/../../db_connect.php';
 function insert_user($conn, $username, $email, $password) {
     $username = mysqli_real_escape_string($conn, $username);
     $email    = mysqli_real_escape_string($conn, $email);
@@ -13,6 +13,7 @@ function select_user($conn, $id) {
     $id  = (int) $id;
     $sql = "SELECT * FROM `users` WHERE id = $id";
     $res = mysqli_query($conn, $sql);
+    if (!$res) return null;
     return mysqli_fetch_assoc($res);
 }
 
@@ -78,4 +79,3 @@ function login_user($conn, $email, $password) {
     if (!password_verify($password, $user['password'])) return false;
     return $user;
 }
-?>
