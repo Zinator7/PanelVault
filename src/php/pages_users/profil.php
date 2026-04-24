@@ -197,7 +197,7 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
         <a href="dashboard.php">
           <span class="icon">🏠</span> Accueil
         </a>
-        <a href="#">
+        <a href="../pages_reader/bibliotheque.php">
           <span class="icon">📚</span> Ma Bibliothèque <!-- Lien vers la bibliothèque -->
         </a>
         <a href="profil.php" class="active">

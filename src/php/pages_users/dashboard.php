@@ -162,7 +162,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                 <a href="#" class="active">
                     <span class="icon">🏠</span> Accueil
                 </a>
-                <a href="#">
+                <a href="../pages_reader/bibliotheque.php">
                     <span class="icon">📚</span> Ma Bibliothèque
                 </a>
                 <a href="profil.php">
@@ -240,7 +240,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                     <?php } else { ?>
                         <div class="stat-card" style="grid-column: 1 / -1; padding: 40px;">
                             <p style="color: var(--muted);">Vous n'avez aucune lecture en cours pour le moment.</p>
-                            <a href="#" class="btn btn-red" style="margin-top: 15px;">Uploader votre scan →</a>
+                            <a href="../pages_reader/upload_comics.php" class="btn btn-red" style="margin-top: 15px;">Uploader votre scan →</a>
                         </div>
                     <?php } ?>
                 </div>
@@ -267,7 +267,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                         <span class="summary-icon">📤</span>
                         <span class="summary-value">Ajouter des comics</span>
                         <span class="summary-label">Importez vos scans</span>
-                        <a href="#" class="btn btn-red">Uploader →</a>
+                        <a href="../pages_reader/upload_comics.php" class="btn btn-red">Uploader →</a>
                     </div>
                 </div>
             </section>

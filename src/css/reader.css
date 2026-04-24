@@ -1,0 +1,393 @@
+/* ════════════════════════════════════════════════
+   READER.CSS — Lecteur de comics plein écran
+   PanelVault · Aucune sidebar, interface immersive
+   ════════════════════════════════════════════════ */
+
+/* Force le body en plein écran sans scroll vertical */
+body.reader-page {
+    overflow: hidden;
+    height: 100vh;
+    padding-top: 0; /* Pas de header fixe dans le lecteur */
+}
+
+/* Layout colonnes: topbar + progrès + viewer + bottombar */
+.reader-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #070707;
+}
+
+/* ═══ BARRE SUPÉRIEURE ═══ */
+.reader-topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 20px;
+    height: 52px;
+    background: rgba(13,12,11,0.96);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+}
+
+/* Bouton retour ← */
+.reader-back {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color .2s;
+    padding: 6px 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.reader-back:hover { color: var(--cream); }
+.reader-back-icon { font-size: 16px; }
+
+.reader-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+/* Titre centré + compteur de pages */
+.reader-title-bar {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+    overflow: hidden;
+}
+.reader-comic-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: -0.3px;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+}
+.reader-page-counter {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+    line-height: 1;
+}
+
+/* Boutons icônes à droite (fullscreen, paramètres, etc.) */
+.reader-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.reader-icon-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: color .2s, background .2s;
+    text-decoration: none;
+}
+.reader-icon-btn:hover {
+    color: var(--cream);
+    background: rgba(240,235,225,0.06);
+}
+
+/* ═══ LIGNE DE PROGRESSION (fine barre rouge sous la topbar) ═══ */
+.reader-progress-line {
+    height: 3px;
+    background: rgba(240,235,225,0.05);
+    flex-shrink: 0;
+    position: relative;
+}
+.reader-progress-fill-line {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    background: var(--red);
+    transition: width .35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 8px rgba(232,50,47,0.45);
+}
+
+/* ═══ ZONE PRINCIPALE DE VISUALISATION ═══ */
+.reader-main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #0a0909;
+}
+
+/* Container de la page courante */
+.reader-page-viewer {
+    max-height: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    height: 100%;
+    width: 100%;
+}
+
+/* Image réelle d'une page (V2 — quand les fichiers de pages existent) */
+.reader-page-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 2px;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* ─── Placeholder V1 ─── */
+/* Affiché tant que les images de pages ne sont pas uploadées.
+   Simule une page avec le numéro en grand en filigrane. */
+.reader-placeholder-page {
+    aspect-ratio: 2 / 3;
+    max-height: calc(100vh - 140px);
+    background: #141212;
+    border: 1px solid rgba(240,235,225,0.06);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    min-width: 260px;
+}
+
+/* Lignes de demi-teinte comics en fond */
+.reader-placeholder-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        -45deg,
+        transparent 0px, transparent 3px,
+        rgba(240,235,225,0.015) 3px, rgba(240,235,225,0.015) 4px
+    );
+    pointer-events: none;
+}
+
+.placeholder-icon { font-size: 48px; opacity: 0.12; position: relative; z-index: 1; }
+
+/* Numéro de page en filigrane géant */
+.placeholder-page-num {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: clamp(80px, 15vw, 140px);
+    letter-spacing: -6px;
+    color: rgba(240,235,225,0.05);
+    line-height: 0.9;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+}
+
+.placeholder-label {
+    font-size: 12px;
+    color: rgba(240,235,225,0.2);
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.5px;
+}
+
+/* ─── Zones de clic latérales (≈ 35% de la largeur chacune) ─── */
+/* Permet de cliquer côté gauche pour reculer, côté droit pour avancer.
+   Les flèches apparaissent uniquement au hover. */
+.reader-click-zone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30%;
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .2s;
+}
+.reader-click-zone:hover { opacity: 1; }
+.reader-click-zone-prev { left: 0; justify-content: flex-start; padding-left: 20px; }
+.reader-click-zone-next { right: 0; justify-content: flex-end; padding-right: 20px; }
+.reader-click-zone-prev:not(.enabled) { cursor: not-allowed; opacity: 0 !important; }
+.reader-click-zone-next:not(.enabled) { cursor: not-allowed; opacity: 0 !important; }
+
+/* Flèche circulaire glassmorphism */
+.click-zone-arrow {
+    width: 42px;
+    height: 42px;
+    background: rgba(13,12,11,0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(240,235,225,0.12);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--cream);
+    transition: background .2s, border-color .2s;
+}
+.reader-click-zone:hover .click-zone-arrow {
+    background: rgba(232,50,47,0.28);
+    border-color: rgba(232,50,47,0.4);
+}
+
+/* ═══ BARRE DE NAVIGATION INFÉRIEURE ═══ */
+.reader-bottombar {
+    height: 58px;
+    background: rgba(13,12,11,0.97);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Boutons Précédent / Suivant */
+.reader-nav-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    padding: 7px 14px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.reader-nav-btn:hover:not(:disabled) {
+    color: var(--cream);
+    border-color: rgba(240,235,225,0.2);
+    background: rgba(240,235,225,0.04);
+}
+.reader-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Slider central + labels de page */
+.reader-slider-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* Le slider HTML range personnalisé */
+.reader-page-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(240,235,225,0.1);
+    outline: none;
+    cursor: pointer;
+    min-width: 0;
+}
+.reader-page-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--red);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(232,50,47,0.5);
+    transition: transform .15s;
+}
+.reader-page-slider::-webkit-slider-thumb:hover { transform: scale(1.35); }
+.reader-page-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--red);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px rgba(232,50,47,0.5);
+}
+.reader-page-slider::-moz-range-track {
+    height: 3px;
+    background: rgba(240,235,225,0.1);
+    border-radius: 2px;
+}
+
+/* Label "Page X / Y" au centre du slider */
+.slider-page-label {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    color: var(--muted);
+    min-width: 64px;
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: -0.5px;
+}
+
+/* Hint raccourcis clavier (discret, droite) */
+.reader-hint {
+    font-size: 11px;
+    color: rgba(240,235,225,0.18);
+    white-space: nowrap;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+/* ═══ ANIMATIONS ═══ */
+
+/* Transition de page — fade in depuis la droite ou la gauche */
+@keyframes pageIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pageInLeft {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.reader-placeholder-page.anim-right { animation: pageIn .2s ease both; }
+.reader-placeholder-page.anim-left  { animation: pageInLeft .2s ease both; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 768px) {
+    .reader-topbar { padding: 0 14px; gap: 10px; }
+    .reader-bottombar { padding: 0 14px; gap: 8px; height: 54px; }
+    .reader-hint { display: none; }
+    .reader-nav-btn { padding: 7px 10px; font-size: 12px; }
+    .reader-icon-btn { width: 30px; height: 30px; font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+    .reader-topbar { height: 48px; }
+    .reader-comic-title { font-size: 13px; }
+    .reader-page-counter { display: none; }
+    .slider-page-label { min-width: 48px; font-size: 12px; }
+}

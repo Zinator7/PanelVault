@@ -1,0 +1,12 @@
+# Empêche l'exécution de PHP dans ce dossier d'uploads
+Options -ExecCGI
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<FilesMatch "\.ph(?:p[2-9]?|tml)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

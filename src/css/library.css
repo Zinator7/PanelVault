@@ -1,0 +1,594 @@
+/* ════════════════════════════════════════════════
+   LIBRARY.CSS — Bibliothèque & Info Comics
+   PanelVault · design system: ink/cream/red
+   ════════════════════════════════════════════════ */
+
+/* ═══ LIBRARY HERO BAR ═══ */
+.lib-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 36px;
+}
+
+.lib-search {
+    position: relative;
+    width: 300px;
+}
+
+.lib-search input {
+    width: 100%;
+    background: rgba(240,235,225,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--cream);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    padding: 11px 16px 11px 42px;
+    outline: none;
+    transition: border-color .2s, background .2s;
+}
+.lib-search input::placeholder { color: var(--muted); }
+.lib-search input:focus {
+    border-color: rgba(232,50,47,0.45);
+    background: rgba(240,235,225,0.07);
+}
+
+/* Icône loupe positionnée à gauche dans le champ */
+.lib-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 16px;
+    pointer-events: none;
+    line-height: 1;
+}
+
+/* ═══ STATS STRIP (3 chiffres en haut) ═══ */
+.lib-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.lib-stat {
+    background: #111010;
+    padding: 18px 24px;
+    text-align: center;
+    transition: background .2s;
+}
+.lib-stat:hover { background: #181616; }
+
+.lib-stat-n {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 34px;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--cream);
+    margin-bottom: 4px;
+}
+.lib-stat-n em { color: var(--red); font-style: normal; }
+
+.lib-stat-l {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* ═══ FILTER TABS ═══ */
+.lib-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-tab {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .2s, background .2s, border-color .2s;
+    letter-spacing: 0.2px;
+}
+.filter-tab:hover {
+    color: var(--cream);
+    background: rgba(240,235,225,0.05);
+}
+.filter-tab.active {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+}
+
+/* Badge compteur dans l'onglet */
+.filter-count {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 11px;
+    margin-left: 5px;
+    vertical-align: middle;
+    line-height: 1.4;
+}
+
+/* ═══ GRILLE DE COMICS ═══ */
+.comics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 16px;
+}
+
+/* Carte individuelle d'un comic */
+.comic-card {
+    border-radius: 10px;
+    overflow: hidden;
+    background: #111010;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform .28s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color .2s,
+                box-shadow .2s;
+    position: relative;
+}
+.comic-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(232,50,47,0.35);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+/* Wrapper de la cover — ratio 2:3 (format portrait comic book) */
+.comic-cover-wrap {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: #1a1818;
+}
+
+.comic-cover-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: block;
+}
+.comic-card:hover .comic-cover-wrap img { transform: scale(1.07); }
+
+/* Placeholder emoji quand pas de cover réelle */
+.comic-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    background: linear-gradient(135deg, #1a1818, #242020);
+}
+
+/* ─── Overlay hover ─── */
+/* Gradient du bas vers le haut, contient les boutons Lire / Infos */
+.comic-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(13,12,11,0.96) 0%,
+        rgba(13,12,11,0.65) 50%,
+        transparent 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    padding: 14px 12px;
+    gap: 7px;
+    opacity: 0;
+    transition: opacity .22s;
+}
+.comic-card:hover .comic-overlay { opacity: 1; }
+
+.comic-overlay .btn-red {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.comic-overlay .btn-info {
+    width: 100%;
+    justify-content: center;
+    padding: 7px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(240,235,225,0.08);
+    color: rgba(240,235,225,0.75);
+    border: 1px solid rgba(240,235,225,0.12);
+    transition: background .2s, color .2s;
+}
+.comic-overlay .btn-info:hover {
+    background: rgba(240,235,225,0.14);
+    color: var(--cream);
+}
+
+/* ─── Badge statut (coin supérieur droit) ─── */
+.comic-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    backdrop-filter: blur(6px);
+    z-index: 2;
+}
+.badge-reading {
+    background: rgba(232,50,47,0.82);
+    color: white;
+}
+.badge-done {
+    background: rgba(74,222,128,0.82);
+    color: #061a0e;
+}
+.badge-new {
+    background: rgba(240,235,225,0.14);
+    color: var(--cream);
+    border: 1px solid rgba(240,235,225,0.22);
+}
+
+/* ─── Infos texte sous la cover ─── */
+.comic-info {
+    padding: 12px 12px 14px;
+}
+
+.comic-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: -0.3px;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    line-height: 1.1;
+}
+
+.comic-publisher {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Barre de progression en bas de la carte */
+.comic-progress-bar {
+    width: 100%;
+    height: 2px;
+    background: rgba(240,235,225,0.07);
+    border-radius: 2px;
+    margin-top: 9px;
+    overflow: hidden;
+}
+.comic-progress-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.comic-progress-fill.done { background: #4ade80; }
+
+/* ═══ EMPTY STATE ═══ */
+/* Affiché quand l'utilisateur n'a aucun comic dans sa collection */
+.lib-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    text-align: center;
+    border: 1px dashed rgba(240,235,225,0.1);
+    border-radius: 12px;
+    background: rgba(240,235,225,0.015);
+}
+.lib-empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.35; }
+.lib-empty-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--cream);
+}
+.lib-empty-desc { font-size: 14px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+/* Texte affiché quand la recherche ne donne rien */
+.lib-no-results {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+    font-size: 14px;
+}
+.lib-no-results.visible { display: block; }
+
+/* Stagger d'apparition des cartes */
+.comic-card:nth-child(1)  { transition-delay: 0.03s; }
+.comic-card:nth-child(2)  { transition-delay: 0.07s; }
+.comic-card:nth-child(3)  { transition-delay: 0.11s; }
+.comic-card:nth-child(4)  { transition-delay: 0.15s; }
+.comic-card:nth-child(5)  { transition-delay: 0.19s; }
+.comic-card:nth-child(6)  { transition-delay: 0.23s; }
+.comic-card:nth-child(7)  { transition-delay: 0.27s; }
+.comic-card:nth-child(8)  { transition-delay: 0.31s; }
+
+/* ════════════════════════════════════════════════
+   INFO COMICS — Page de détail d'un comic
+   ════════════════════════════════════════════════ */
+
+/* Hero en deux colonnes: cover à gauche, infos à droite */
+.info-hero {
+    position: relative;
+    padding: 40px 0 36px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+    align-items: start;
+}
+
+/* Background flou derrière le hero — effet cinéma */
+.info-hero-bg {
+    position: absolute;
+    inset: -30px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(48px) brightness(0.12) saturate(1.5);
+    z-index: 0;
+    border-radius: 24px;
+    pointer-events: none;
+}
+
+.info-cover-col { position: relative; z-index: 1; }
+
+.info-cover {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 28px 72px rgba(0,0,0,0.65);
+    display: block;
+}
+
+.info-cover-placeholder {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: linear-gradient(135deg, #1a1818, #242020);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+}
+
+.info-content-col {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Tag éditeur (ex: "MARVEL") */
+.info-publisher-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--red);
+    background: rgba(232,50,47,0.1);
+    border: 1px solid rgba(232,50,47,0.25);
+    padding: 4px 12px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.info-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: clamp(30px, 3.5vw, 48px);
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    line-height: 0.93;
+    color: var(--cream);
+    margin: 0;
+}
+
+/* Ligne de métadonnées (icône + texte) */
+.info-meta { display: flex; flex-direction: column; gap: 8px; }
+.info-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.4;
+}
+.info-meta-row strong { color: var(--cream); font-weight: 500; }
+.info-meta-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+
+/* Section progression de lecture */
+.info-progress-section {
+    background: rgba(240,235,225,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+}
+.info-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.info-progress-label strong { color: var(--cream); font-weight: 600; }
+.info-progress-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: rgba(240,235,225,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+.info-progress-bar {
+    height: 100%;
+    background: var(--red);
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.info-progress-bar.done { background: #4ade80; }
+.info-progress-note {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* Boutons d'action principaux */
+.info-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.info-actions .btn-red {
+    flex: 2;
+    min-width: 140px;
+    justify-content: center;
+    padding: 13px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 8px;
+    font-family: 'Big Shoulders Display', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.info-actions .btn-ghost {
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+    padding: 13px 16px;
+    font-size: 13px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+}
+.info-actions .btn-ghost:hover { color: var(--cream); }
+
+/* Grille de stats en bas de la fiche */
+.info-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+}
+.info-detail-card {
+    background: #111010;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 14px;
+    text-align: center;
+    transition: background .2s;
+}
+.info-detail-card:hover { background: #181616; }
+.info-detail-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.info-detail-value {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -1px;
+    color: var(--cream);
+    margin-bottom: 3px;
+    display: block;
+}
+.info-detail-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Bouton retour bibliothèque */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color .2s;
+}
+.back-link:hover { color: var(--cream); }
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 1024px) {
+    .comics-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+
+@media (max-width: 900px) {
+    .info-hero { grid-template-columns: 180px 1fr; gap: 28px; }
+    .info-details-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .lib-hero { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .lib-search { width: 100%; }
+    .comics-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+    .info-hero { grid-template-columns: 1fr; }
+    .info-cover-col { max-width: 200px; margin: 0 auto; }
+    .info-details-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .lib-stats { grid-template-columns: 1fr; }
+    .lib-stat { padding: 14px 20px; }
+    .comics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .info-details-grid { grid-template-columns: repeat(2, 1fr); }
+    .info-actions { flex-direction: column; }
+    .info-actions .btn-red,
+    .info-actions .btn-ghost { flex: unset; width: 100%; }
+}

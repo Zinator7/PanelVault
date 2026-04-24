@@ -51,6 +51,7 @@ $count_finished = mysqli_fetch_assoc($res_r)['c'] ?? 0;
             <div class="user-dropdown-menu">
                 <a href="src/php/pages_users/profil.php">Mon Profil</a>
                 <a href="src/php/pages_users/dashboard.php">Dashboard</a>
+                <a href="src/php/pages_users/badge_users.php">Mes Badges</a>
                 <a href="#">Paramètres</a>
                 <hr>
                 <a href="src/php/pages_connexion/logout.php">Déconnexion</a>
@@ -79,6 +80,7 @@ $count_finished = mysqli_fetch_assoc($res_r)['c'] ?? 0;
   ?>
       <a href="src/php/pages_users/profil.php" class="mm-ghost">Mon Profil</a>
       <a href="src/php/pages_users/dashboard.php" class="mm-ghost">Dashboard</a>
+      <a href="src/php/pages_users/badge_users.php" class="mm-ghost">Mes Badges</a>
       <a href="#" class="mm-ghost">Paramètres</a>
       <hr style="border-color:var(--border);border-width:0.5px;"/>
       <a href="src/php/pages_connexion/logout.php" class="mm-red">Déconnexion →</a>

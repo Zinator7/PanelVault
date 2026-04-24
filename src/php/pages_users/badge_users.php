@@ -148,7 +148,7 @@ function get_rarity(int $index, int $total): array {
       </div>
       <nav class="sidebar-nav">
         <a href="dashboard.php"><span class="icon">🏠</span> Accueil</a>
-        <a href="#"><span class="icon">📚</span> Ma Bibliothèque</a>
+        <a href="../pages_reader/bibliotheque.php"><span class="icon">📚</span> Ma Bibliothèque</a>
         <a href="profil.php"><span class="icon">👤</span> Mon Profil</a>
         <a href="badge_users.php" class="active"><span class="icon">🏅</span> Mes Badges</a>
         <a href="../../../leaderboard.php"><span class="icon">🏆</span> Classement</a>

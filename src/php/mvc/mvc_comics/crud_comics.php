@@ -1,14 +1,17 @@
 <?php
 include '../../db_connect.php';
 
-function insert_comic($conn, $user_id, $title, $publisher, $cover, $total_pages) {
+function insert_comic($conn, $user_id, $title, $publisher, $cover, $total_pages, $file_path = null, $file_type = null) {
     $user_id     = (int) $user_id;
     $title       = mysqli_real_escape_string($conn, $title);
     $publisher   = mysqli_real_escape_string($conn, $publisher);
     $cover       = mysqli_real_escape_string($conn, $cover);
     $total_pages = (int) $total_pages;
+    $fp_sql      = $file_path ? "'" . mysqli_real_escape_string($conn, $file_path) . "'" : 'NULL';
+    $ft_sql      = $file_type ? "'" . mysqli_real_escape_string($conn, $file_type) . "'" : 'NULL';
 
-    $sql = "INSERT INTO `comics` (`user_id`, `title`, `publisher`, `cover`, `total_pages`) VALUES ($user_id, '$title', '$publisher', '$cover', $total_pages)";
+    $sql = "INSERT INTO `comics` (`user_id`, `title`, `publisher`, `cover`, `total_pages`, `file_path`, `file_type`)
+            VALUES ($user_id, '$title', '$publisher', '$cover', $total_pages, $fp_sql, $ft_sql)";
     return mysqli_query($conn, $sql);
 }
 
