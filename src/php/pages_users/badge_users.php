@@ -99,6 +99,7 @@ function get_rarity(int $index, int $total): array {
           <div class="user-dropdown-menu">
             <a href="profil.php">Mon Profil</a>
             <a href="dashboard.php">Dashboard</a>
+            <a href="badge_users.php">Mes Badges</a>
             <a href="#">Paramètres</a>
             <hr>
             <a href="../pages_connexion/logout.php">Déconnexion</a>
@@ -120,6 +121,7 @@ function get_rarity(int $index, int $total): array {
     <?php if (isset($_SESSION['user'])): ?>
       <a href="profil.php" class="mm-ghost">Mon Profil</a>
       <a href="dashboard.php" class="mm-ghost">Dashboard</a>
+      <a href="badge_users.php" class="mm-ghost">Mes Badges</a>
       <a href="#" class="mm-ghost">Paramètres</a>
       <hr style="border-color:var(--border);border-width:0.5px;"/>
       <a href="../pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
@@ -192,22 +194,22 @@ function get_rarity(int $index, int $total): array {
       <div class="badges-stats-strip">
         <div class="bss-card reveal">
           <span class="bss-icon">🏅</span>
-          <span class="bss-value" data-target="<?php echo $nb_badges; ?>"><?php echo $nb_badges; ?></span>
+          <span class="bss-value" data-type="badges" data-target="<?php echo $nb_badges; ?>"><?php echo $nb_badges; ?></span>
           <span class="bss-label">Débloqués</span>
         </div>
         <div class="bss-card reveal">
           <span class="bss-icon">📊</span>
-          <span class="bss-value" data-target="<?php echo $progress_pct; ?>"><?php echo $progress_pct; ?><small>%</small></span>
+          <span class="bss-value" data-type="percent" data-target="<?php echo $progress_pct; ?>"><?php echo $progress_pct; ?><small>%</small></span>
           <span class="bss-label">Complétion</span>
         </div>
         <div class="bss-card reveal">
           <span class="bss-icon">✨</span>
-          <span class="bss-value" data-target="<?php echo $nb_earned_this_month; ?>"><?php echo $nb_earned_this_month; ?></span>
+          <span class="bss-value" data-type="month" data-target="<?php echo $nb_earned_this_month; ?>"><?php echo $nb_earned_this_month; ?></span>
           <span class="bss-label">Ce mois-ci</span>
         </div>
         <div class="bss-card reveal">
           <span class="bss-icon">🔒</span>
-          <span class="bss-value" data-target="<?php echo $nb_locked; ?>"><?php echo $nb_locked; ?></span>
+          <span class="bss-value" data-type="locked" data-target="<?php echo $nb_locked; ?>"><?php echo $nb_locked; ?></span>
           <span class="bss-label">À débloquer</span>
         </div>
       </div>
@@ -330,6 +332,7 @@ function get_rarity(int $index, int $total): array {
     <p>© 2025 PanelVault · Projet étudiant L1 Informatique</p>
   </footer>
 
+  <script src="../../js/js-profil.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded', () => {
 

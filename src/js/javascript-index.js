@@ -122,3 +122,23 @@ const revealObserver = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => {
   revealObserver.observe(el);
 });
+
+/* ═══ TEMPS RÉEL GLOBAL ═══ */
+// Récupère les stats globales toutes les 60 secondes (utilisateurs, comics...)
+function updateGlobalStatsRealTime() {
+    // On suppose que index.php est à la racine, donc accès à src/php/
+    fetch('src/php/api_global_stats.php')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelectorAll('[data-type]').forEach(el => {
+                const type = el.getAttribute('data-type');
+                if (data[type] !== undefined) {
+                    // On met à jour la cible de l'animation et le texte affiché
+                    el.dataset.target = data[type];
+                    el.textContent = data[type].toLocaleString('fr-FR');
+                }
+            });
+        })
+        .catch(err => console.error('Erreur stats globales:', err));
+}
+setInterval(updateGlobalStatsRealTime, 60000); // Mise à jour auto toutes les minutes

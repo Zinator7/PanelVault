@@ -107,4 +107,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.history-item').forEach(item => histObserver.observe(item));
 
+    // ─── TEMPS RÉEL (polling) ────────────────────────────────────────────────
+    // Récupère les stats toutes les 30 secondes et met à jour les compteurs
+    function updateStatsRealTime() {
+        fetch('api_stats.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) return;
+                
+                // On met à jour tous les éléments qui ont un data-type correspondant
+                document.querySelectorAll('[data-type]').forEach(el => {
+                    const type = el.getAttribute('data-type');
+                    if (data[type] !== undefined) {
+                        // On met à jour le data-target pour les futures animations et le texte
+                        el.dataset.target = data[type];
+                        el.textContent = data[type];
+                    }
+                });
+            })
+            .catch(err => console.error('Erreur stats temps réel:', err));
+    }
+
+    setInterval(updateStatsRealTime, 30000); // 30 secondes
 });

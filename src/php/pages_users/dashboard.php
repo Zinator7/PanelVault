@@ -108,6 +108,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                     <div class="user-dropdown-menu">
                         <a href="profil.php">Mon Profil</a>
                         <a href="dashboard.php">Dashboard</a>
+                        <a href="badge_users.php">Mes Badges</a>
                         <a href="#">Paramètres</a>
                         <hr>
                         <a href="../pages_connexion/logout.php">Déconnexion</a>
@@ -133,6 +134,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
         <?php if (isset($_SESSION['user']) == true) { ?>
             <a href="profil.php" class="mm-ghost">Mon Profil</a>
             <a href="dashboard.php" class="mm-ghost">Dashboard</a>
+            <a href="badge_users.php" class="mm-ghost">Mes Badges</a>
             <a href="#" class="mm-ghost">Paramètres</a>
             <hr style="border-color:var(--border);border-width:0.5px;"/>
             <a href="../pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
@@ -190,22 +192,22 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                 <div class="stats-grid">
                     <div class="stat-card reveal">
                         <span class="stat-icon">✨</span>
-                        <span class="stat-value"><span class="ctr" data-target="<?php echo $xp_totale; ?>">0</span> XP</span>
+                        <span class="stat-value"><span class="ctr" data-type="xp" data-target="<?php echo $xp_totale; ?>">0</span> XP</span>
                         <span class="stat-label">Total XP</span>
                     </div>
                     <div class="stat-card reveal">
                         <span class="stat-icon">📖</span>
-                        <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_comics_lus; ?>">0</span></span>
+                        <span class="stat-value"><span class="ctr" data-type="read" data-target="<?php echo $nb_comics_lus; ?>">0</span></span>
                         <span class="stat-label">Comics lus</span>
                     </div>
                     <div class="stat-card reveal">
                         <span class="stat-icon">🔥</span>
-                        <span class="stat-value"><span class="ctr" data-target="<?php echo $streak; ?>">0</span> jours</span>
+                        <span class="stat-value"><span class="ctr" data-type="streak" data-target="<?php echo $streak; ?>">0</span> jours</span>
                         <span class="stat-label">Streak actuel</span>
                     </div>
                     <div class="stat-card reveal">
                         <span class="stat-icon">🏅</span>
-                        <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_badges; ?>">0</span></span>
+                        <span class="stat-value"><span class="ctr" data-type="badges" data-target="<?php echo $nb_badges; ?>">0</span></span>
                         <span class="stat-label">Badges débloqués</span>
                     </div>
                 </div>

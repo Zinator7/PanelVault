@@ -5,8 +5,15 @@ session_start();
 include 'src/php/db_connect.php';
 include 'src/php/mvc/mvc_users/crud_users.php';
 
-// On récupère l'utilisateur en session s'il est connecté
+// Récupération des vraies statistiques globales
+$res_u = mysqli_query($conn, "SELECT COUNT(*) as c FROM users");
+$count_users = mysqli_fetch_assoc($res_u)['c'] ?? 0;
 
+$res_c = mysqli_query($conn, "SELECT COUNT(*) as c FROM comics");
+$count_comics = mysqli_fetch_assoc($res_c)['c'] ?? 0;
+
+$res_r = mysqli_query($conn, "SELECT COUNT(*) as c FROM reading_progress WHERE completed = 1");
+$count_finished = mysqli_fetch_assoc($res_r)['c'] ?? 0;
 
 ?>
 <!DOCTYPE html>
@@ -171,11 +178,11 @@ include 'src/php/mvc/mvc_users/crud_users.php';
       <div class="hero-cta">
         <div class="hero-stats-mini">
           <div class="hsm">
-            <div class="hsm-n"><span class="ctr" data-target="1240">0</span><em>+</em></div>
+            <div class="hsm-n"><span class="ctr" data-type="users" data-target="<?php echo $count_users; ?>">0</span><em>+</em></div>
             <div class="hsm-l">Utilisateurs</div>
           </div>
           <div class="hsm">
-            <div class="hsm-n"><span class="ctr" data-target="58300">0</span><em>+</em></div>
+            <div class="hsm-n"><span class="ctr" data-type="completed" data-target="<?php echo $count_finished; ?>">0</span><em>+</em></div>
             <div class="hsm-l">Comics lus</div>
           </div>
         </div>
@@ -253,15 +260,15 @@ include 'src/php/mvc/mvc_users/crud_users.php';
 <!-- STATS -->
 <div class="stats-full reveal">
   <div class="sf">
-    <div class="sf-n"><span class="ctr2" data-target="1240">0</span><em>+</em></div>
+    <div class="sf-n"><span class="ctr2" data-type="users" data-target="<?php echo $count_users; ?>">0</span><em>+</em></div>
     <div class="sf-l">Utilisateurs actifs</div>
   </div>
   <div class="sf">
-    <div class="sf-n"><span class="ctr2" data-target="58300">0</span><em>+</em></div>
+    <div class="sf-n"><span class="ctr2" data-type="completed" data-target="<?php echo $count_finished; ?>">0</span><em>+</em></div>
     <div class="sf-l">Comics lus</div>
   </div>
   <div class="sf">
-    <div class="sf-n"><span class="ctr2" data-target="4200">0</span><em>+</em></div>
+    <div class="sf-n"><span class="ctr2" data-type="comics" data-target="<?php echo $count_comics; ?>">0</span><em>+</em></div>
     <div class="sf-l">Scans uploadés</div>
   </div>
 </div>

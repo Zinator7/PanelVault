@@ -139,6 +139,7 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
             <div class="user-dropdown-menu">
                 <a href="profil.php">Mon Profil</a>
                 <a href="dashboard.php">Dashboard</a>
+                <a href="badge_users.php">Mes Badges</a>
                 <a href="#">Paramètres</a>
                 <hr>
                 <a href="../pages_connexion/logout.php">Déconnexion</a>
@@ -165,6 +166,7 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
     <?php if (isset($_SESSION['user']) == true) { ?>
         <a href="profil.php" class="mm-ghost">Mon Profil</a>
         <a href="dashboard.php" class="mm-ghost">Dashboard</a>
+        <a href="badge_users.php" class="mm-ghost">Mes Badges</a>
         <a href="#" class="mm-ghost">Paramètres</a>
         <hr style="border-color:var(--border);border-width:0.5px;"/>
         <a href="../pages_connexion/logout.php" class="mm-red">Déconnexion →</a>
@@ -285,12 +287,12 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
         <div class="profile-stats-grid">
           <div class="stat-card reveal">
             <span class="stat-icon">✨</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $xp_totale; ?>">0</span> XP</span> <!-- XP totale -->
+            <span class="stat-value"><span class="ctr" data-type="xp" data-target="<?php echo $xp_totale; ?>">0</span> XP</span> <!-- XP totale -->
             <span class="stat-label">Total XP</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">📖</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_lus; ?>">0</span></span> <!-- Comics lus -->
+            <span class="stat-value"><span class="ctr" data-type="read" data-target="<?php echo $nb_lus; ?>">0</span></span> <!-- Comics lus -->
             <span class="stat-label">Comics lus</span>
           </div>
           <div class="stat-card reveal">
@@ -300,7 +302,7 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">🏅</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_badges; ?>">0</span></span> <!-- Badges débloqués -->
+            <span class="stat-value"><span class="ctr" data-type="badges" data-target="<?php echo $nb_badges; ?>">0</span></span> <!-- Badges débloqués -->
             <span class="stat-label">Badges débloqués</span>
           </div>
           <div class="stat-card reveal">
