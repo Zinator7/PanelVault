@@ -1,69 +1,104 @@
 <?php
-// On démarre la session pour récupérer les données de l'utilisateur
 session_start();
 
-// On inclut les fichiers de connexion et les fonctions CRUD (style L1 : include)
 include '../../php/db_connect.php';
 include '../../php/mvc/mvc_users/crud_users.php';
 include '../../php/mvc/mvc_reading/crud_reading.php';
 include '../../php/mvc/mvc_badges/crud_badges.php';
 
-// Vérification de sécurité : si on n'est pas connecté, on redirige vers le login
-if (isset($_SESSION['user']) == false) {
+// CORRIGÉ : !isset() est la bonne façon d'écrire "si la variable n'existe pas"
+// L'ancien code utilisait == false ce qui est moins lisible
+if (!isset($_SESSION['user'])) {
     header("Location: ../pages_connexion/login.php");
     exit();
 }
 
-// On récupère l'utilisateur en session
 $user_session = $_SESSION['user'];
-$user_id = $user_session['id'];
+// CORRIGÉ : on force l'id à être un entier avec (int) pour éviter les injections SQL
+$user_id      = (int) $user_session['id'];
+// On recharge l'utilisateur depuis la DB pour avoir des stats toujours à jour
+$user         = select_user($conn, $user_id);
 
-// Pour être sûr d'avoir les "vraies" stats à jour (XP, Niveau), on refait un SELECT
-$user = select_user($conn, $user_id);
+// --- NIVEAU & XP ---
+// isset() + opérateur ternaire ?: donne une valeur par défaut si la clé n'existe pas
+$niveau       = isset($user['level']) ? (int) $user['level'] : 1;
+$xp_totale    = isset($user['xp'])    ? (int) $user['xp']    : 0;
+$xp_par_palier     = 1000;                                     // 1000 XP pour passer un niveau
+$xp_seuil_actuel   = ($niveau - 1) * $xp_par_palier;          // XP cumulée au début du niveau actuel
+$xp_dans_le_niveau = $xp_totale - $xp_seuil_actuel;           // XP gagnée dans le niveau en cours
+// max(0, min(100, ...)) remplace les deux if séparés de l'ancien code — même résultat, plus court
+$pourcentage = max(0, min(100, ($xp_dans_le_niveau / $xp_par_palier) * 100));
 
-// --- CALCULS DES STATISTIQUES (Version explicite L1) ---
+// --- STREAK ---
+// CORRIGÉ : $streak_actuel et $streak_max n'étaient jamais définis dans l'ancien code
+// → provoquait des erreurs PHP "Undefined variable" à l'affichage
+$streak_actuel = isset($user['streak'])     ? (int) $user['streak']     : 0;
+$streak_max    = isset($user['streak_max']) ? (int) $user['streak_max'] : 0;
 
-// 1. Niveau et XP
-if (isset($user['level'])) {
-    $niveau = $user['level'];
-} else {
-    $niveau = 1;
-}
-
-if (isset($user['xp'])) {
-    $xp_totale = $user['xp'];
-} else {
-    $xp_totale = 0;
-}
-
-// 2. Barre de progression (1000 XP par palier)
-$xp_par_palier = 1000;
-$xp_seuil_actuel = ($niveau - 1) * $xp_par_palier;
-$xp_dans_le_niveau = $xp_totale - $xp_seuil_actuel;
-
-// Calcul du pourcentage pour le CSS (--xp-w) et l'anneau SVG
-$pourcentage = ($xp_dans_le_niveau / $xp_par_palier) * 100;
-if ($pourcentage > 100) {
-    $pourcentage = 100;
-}
-if ($pourcentage < 0) {
-    $pourcentage = 0;
-}
-
-// 3. Date d'inscription
+// --- DATE D'INSCRIPTION ---
 $date_membre = "Inconnu";
-if (isset($user['created_at'])) {
-    $date_objet = new DateTime($user['created_at']);
-    $date_membre = date_format($date_objet, 'd M. Y');
+// !empty() vérifie à la fois que la clé existe ET qu'elle n'est pas vide
+if (!empty($user['created_at'])) {
+    $date_membre = date_format(new DateTime($user['created_at']), 'd M. Y');
 }
 
-// 4. Données réelles des autres tables
+// --- LECTURES & BADGES ---
 $badges_possedes = list_user_badges($conn, $user_id);
-$nb_badges = count($badges_possedes);
+$nb_badges       = count($badges_possedes);
 
-$comics_en_cours = list_reading($conn, $user_id);
-$comics_finis = list_completed($conn, $user_id);
-$nb_lus = count($comics_finis);
+$comics_en_cours     = list_reading($conn, $user_id);
+$comics_finis        = list_completed($conn, $user_id);
+$nb_lus              = count($comics_finis);
+// CORRIGÉ : $nb_series_terminees n'était jamais défini → erreur PHP
+$nb_series_terminees = $nb_lus; // une série terminée = un comic avec completed = 1
+
+// --- TEMPS DE LECTURE ---
+// CORRIGÉ : $temps_lecture_heures n'était jamais défini → erreur PHP
+// get_total_reading_time() additionne les pages des comics finis et divise par 60
+$temps_lecture_heures = get_total_reading_time($conn, $user_id);
+
+// --- CLASSEMENT ---
+// CORRIGÉ : $top_classement_text n'était jamais défini → erreur PHP
+// list_users() retourne les users triés par XP décroissant
+// On cherche la position (index) de l'utilisateur dans ce tableau
+$tous_users = list_users($conn);
+$nb_total   = count($tous_users);
+$rang       = $nb_total; // valeur par défaut = dernier si non trouvé
+foreach ($tous_users as $i => $u) {
+    // $i commence à 0, donc le premier est rang 1
+    if ((int) $u['id'] === $user_id) { $rang = $i + 1; break; }
+}
+// On génère un texte lisible selon la position
+if ($rang === 1) {
+    $top_classement_text = '#1 du classement';
+} elseif ($nb_total > 1 && ($rang / $nb_total) <= 0.10) {
+    $top_classement_text = 'Top 10%';
+} elseif ($nb_total > 1 && ($rang / $nb_total) <= 0.25) {
+    $top_classement_text = 'Top 25%';
+} else {
+    $top_classement_text = '#' . $rang . ' / ' . $nb_total;
+}
+
+// --- ACTIVITÉ POUR LE CALENDRIER STREAK ---
+// NOUVEAU : on récupère les jours où l'utilisateur a lu quelque chose sur 91 jours (13 semaines)
+// DATE(last_read_at) extrait uniquement la date (sans l'heure) pour regrouper par jour
+// COUNT(*) compte le nombre de comics lus ce jour-là (intensité de la couleur)
+$streak_activity = [];
+$sql_cal = "SELECT DATE(last_read_at) as d, COUNT(*) as n
+            FROM reading_progress
+            WHERE user_id = $user_id AND last_read_at >= DATE_SUB(NOW(), INTERVAL 91 DAY)
+            GROUP BY DATE(last_read_at)";
+$res_cal = mysqli_query($conn, $sql_cal);
+// On construit un tableau associatif : ["2025-04-10" => 2, "2025-04-11" => 1, ...]
+while ($row = mysqli_fetch_assoc($res_cal)) {
+    $streak_activity[$row['d']] = (int) $row['n'];
+}
+
+// --- TOUS LES BADGES (pour aperçu verrouillé) ---
+// NOUVEAU : si l'utilisateur n'a aucun badge, on charge tous les badges du jeu
+// pour les afficher en version "verrouillée" → donne des objectifs visuels
+// Si l'utilisateur a déjà des badges, on n'a pas besoin de cette liste → tableau vide
+$tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -194,7 +229,8 @@ $nb_lus = count($comics_finis);
           <div class="pbc" style="background-image:url('../../assets/img/superman.jpg')"></div>
         </div>
         <div class="profile-banner-overlay"></div>
-        <span class="profile-banner-ghost">03</span>
+        <!-- CORRIGÉ : était "03" (fausse donnée template) → affiche maintenant le vrai niveau -->
+        <span class="profile-banner-ghost">LVL <?php echo $niveau; ?></span>
       </div>
 
       <!-- PROFILE HERO -->
@@ -215,11 +251,19 @@ $nb_lus = count($comics_finis);
           <h1 class="profile-username"><?php echo htmlspecialchars($user['username']); ?></h1> <!-- Pseudo de l'utilisateur -->
           <p class="profile-tagline">Lecteur passionné · Membre depuis le <?php echo $date_membre; ?></p> <!-- Date d'inscription -->
           <div class="profile-pills">
-            <span class="profile-pill accent">🔥 <?php echo $streak_actuel; ?> jours de streak</span> <!-- Streak actuel -->
-            <span class="profile-pill accent">⭐ <?php echo $top_classement_text; ?></span> <!-- Rang de l'utilisateur -->
-            <span class="profile-pill">📖 <?php echo $nb_lus; ?> comics lus</span> <!-- Nombre de comics lus -->
-            <span class="profile-pill">🏅 <?php echo $nb_badges; ?> badges</span> <!-- Nombre de badges débloqués -->
+            <!-- CORRIGÉ : on n'affiche la pill streak que si streak > 0, sinon "0 jours" est inutile -->
+            <?php if ($streak_actuel > 0): ?>
+            <span class="profile-pill accent">🔥 <?php echo $streak_actuel; ?> jours de streak</span>
+            <?php endif; ?>
+            <!-- CORRIGÉ : $top_classement_text était undefined → maintenant calculé depuis list_users() -->
+            <span class="profile-pill accent">⭐ <?php echo $top_classement_text; ?></span>
+            <span class="profile-pill">📖 <?php echo $nb_lus; ?> comics lus</span>
+            <!-- AJOUT : pluriel conditionnel "badge" vs "badges" -->
+            <span class="profile-pill">🏅 <?php echo $nb_badges; ?> badge<?php echo $nb_badges > 1 ? 's' : ''; ?></span>
+            <!-- CORRIGÉ : $temps_lecture_heures était undefined → calculé via get_total_reading_time() -->
+            <?php if ($temps_lecture_heures > 0): ?>
             <span class="profile-pill">⏱️ <?php echo $temps_lecture_heures; ?>h de lecture</span>
+            <?php endif; ?>
           </div>
         </div>
 
@@ -251,7 +295,7 @@ $nb_lus = count($comics_finis);
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">🔥</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $streak_actuel; ?>">0</span> j.</span> <!-- Streak actuel -->
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $streak_actuel; ?>">0</span> j.</span>
             <span class="stat-label">Streak actuel</span>
           </div>
           <div class="stat-card reveal">
@@ -261,12 +305,12 @@ $nb_lus = count($comics_finis);
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">⏱️</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $temps_lecture_heures; ?>">0</span> h</span> <!-- Temps de lecture -->
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $temps_lecture_heures; ?>">0</span> h</span>
             <span class="stat-label">Temps de lecture</span>
           </div>
           <div class="stat-card reveal">
             <span class="stat-icon">✅</span>
-            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_series_terminees; ?>">0</span></span> <!-- Séries terminées -->
+            <span class="stat-value"><span class="ctr" data-target="<?php echo $nb_series_terminees; ?>">0</span></span>
             <span class="stat-label">Séries terminées</span>
           </div>
         </div>
@@ -305,8 +349,8 @@ $nb_lus = count($comics_finis);
 
             <div class="lp-meta">
               <div class="lp-meta-row">📅 <span>Membre depuis <strong><?php echo $date_membre; ?></strong></span></div>
-              <div class="lp-meta-row">🏆 <span><?php echo $top_classement_text; ?> cette semaine</span></div>
-              <div class="lp-meta-row">🔥 <span>Meilleur streak : <strong><?php if(isset($user['streak_max'])) { echo $user['streak_max']; } else { echo 0; } ?> jours</strong></span></div>
+              <div class="lp-meta-row">🏆 <span><?php echo $top_classement_text; ?></span></div>
+              <div class="lp-meta-row">🔥 <span>Meilleur streak : <strong><?php echo $streak_max; ?> jours</strong></span></div>
             </div>
           </div>
 
@@ -318,7 +362,7 @@ $nb_lus = count($comics_finis);
                 <h3 class="streak-title">Calendrier de Lecture</h3>
               </div>
               <div class="streak-count">
-                <span class="streak-count-num">🔥 <?php echo $streak_actuel; ?></span> <!-- Streak actuel -->
+                <span class="streak-count-num">🔥 <?php echo $streak_actuel; ?></span>
                 <span class="streak-count-label">jours consécutifs</span>
               </div>
             </div>
@@ -352,24 +396,37 @@ $nb_lus = count($comics_finis);
         <h2 class="s-title reveal">Vos Badges.</h2>
 
         <div class="badges-grid">
-            <?php 
-            // On affiche les badges que l'utilisateur possède réellement
-            if (count($badges_possedes) > 0) { 
-                foreach ($badges_possedes as $badge) { 
-            ?>
+            <?php if ($nb_badges > 0): ?>
+                <!-- CAS 1 : l'utilisateur a des badges → on les affiche normalement -->
+                <?php foreach ($badges_possedes as $badge): ?>
                     <div class="badge-card reveal">
                         <span class="badge-icon"><?php echo $badge['icon']; ?></span>
                         <span class="badge-name"><?php echo htmlspecialchars($badge['name']); ?></span>
                         <span class="badge-desc"><?php echo htmlspecialchars($badge['description']); ?></span>
+                        <!-- AJOUT : date réelle d'obtention depuis la colonne earned_at de user_badges -->
+                        <span class="badge-desc" style="font-size:11px;color:var(--muted);margin-top:6px;">
+                            Obtenu le <?php echo date('d M. Y', strtotime($badge['earned_at'])); ?>
+                        </span>
                     </div>
-            <?php 
-                }
-            } else { 
-            ?>
-                <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 20px;">
-                    Vous n'avez pas encore débloqué de badges. Continuez à lire pour en gagner !
+                <?php endforeach; ?>
+            <?php elseif (count($tous_badges) > 0): ?>
+                <!-- CAS 2 : l'utilisateur n'a aucun badge MAIS il en existe dans la DB -->
+                <!-- NOUVEAU : on affiche les 6 premiers en version "verrouillée" (classe .locked) -->
+                <!-- Objectif : montrer à l'utilisateur ce qu'il peut débloquer -->
+                <?php foreach (array_slice($tous_badges, 0, 6) as $badge): ?>
+                    <div class="badge-card locked reveal">
+                        <span class="badge-icon">🔒</span>
+                        <span class="badge-name"><?php echo htmlspecialchars($badge['name']); ?></span>
+                        <span class="badge-desc"><?php echo htmlspecialchars($badge['description']); ?></span>
+                        <span class="badge-locked-hint">Non débloqué</span>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- CAS 3 : aucun badge dans la DB du tout -->
+                <p style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 20px;">
+                    Aucun badge disponible pour le moment.
                 </p>
-            <?php } ?>
+            <?php endif; ?>
         </div>
       </section>
 
@@ -436,6 +493,11 @@ $nb_lus = count($comics_finis);
     <a class="logo" href="#">Panel<em>Vault</em></a>
     <p>© 2025 PanelVault · Projet étudiant L1 Informatique</p>
   </footer>
+
+  <!-- NOUVEAU : on passe les données PHP au JS via une variable globale window.streakData -->
+  <!-- json_encode() convertit le tableau PHP en JSON lisible par JavaScript -->
+  <!-- Exemple : window.streakData = {"2025-04-10": 2, "2025-04-22": 1} -->
+  <script>window.streakData = <?php echo json_encode($streak_activity); ?>;</script>
 
 </body>
 </html>
