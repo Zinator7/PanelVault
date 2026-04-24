@@ -1,6 +1,6 @@
 /* ═══ BADGES PAGE ═══ */
 
-/* ─── PAGE HEADER ─────────────────────────────────────────────────────────── */
+/* ─── EN-TÊTE DE PAGE ──────────────────────────────────────────────────────── */
 .badges-page-header {
     padding: 60px 48px 48px;
     display: flex;
@@ -28,7 +28,7 @@
 }
 .badges-subtitle strong { color: var(--cream); font-weight: 500; }
 
-/* ─── GLOBAL PROGRESS BAR ────────────────────────────────────────────────── */
+/* ─── BARRE DE PROGRESSION GLOBALE ─────────────────────────────────────────── */
 .badges-global-progress {
     flex-shrink: 0;
     min-width: 240px;
@@ -73,7 +73,61 @@
 }
 .bgp-complete { color: #4ade80; font-weight: 500; }
 
-/* ─── FEATURED BADGE ─────────────────────────────────────────────────────── */
+/* ─── BANDE DE STATS RAPIDES ────────────────────────────────────────────────── */
+.badges-stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 28px 48px;
+    border-bottom: 1px solid var(--border);
+}
+
+.bss-card {
+    background: rgba(240,235,225,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background .2s, border-color .2s, transform .25s;
+    cursor: default;
+}
+.bss-card:hover {
+    background: rgba(240,235,225,0.055);
+    border-color: rgba(240,235,225,0.13);
+    transform: translateY(-2px);
+}
+
+.bss-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.bss-value {
+    display: block;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 38px;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--cream);
+}
+.bss-value small {
+    font-size: 22px;
+    letter-spacing: -1px;
+    opacity: 0.8;
+}
+
+.bss-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+}
+
+/* ─── BADGE MIS EN AVANT ────────────────────────────────────────────────────── */
 .badges-featured-wrap {
     padding: 40px 48px 0;
 }
@@ -90,7 +144,6 @@
     overflow: hidden;
 }
 
-/* Glow rouge en arrière-plan */
 .bf-glow {
     position: absolute;
     top: -60px;
@@ -101,7 +154,6 @@
     pointer-events: none;
 }
 
-/* Effet shine qui traverse la carte */
 .bf-shine {
     position: absolute;
     inset: 0;
@@ -156,16 +208,125 @@
     color: rgba(240,235,225,0.35);
 }
 
-/* ─── BADGES SECTION ─────────────────────────────────────────────────────── */
+/* ─── PROCHAINS OBJECTIFS ───────────────────────────────────────────────────── */
+.badges-next-wrap {
+    padding: 40px 48px 0;
+}
+
+.badges-next-header {
+    margin-bottom: 18px;
+}
+
+.badges-next-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    color: var(--cream);
+    line-height: 1.1;
+}
+
+.badges-next-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.badge-next-card {
+    position: relative;
+    background: rgba(240,235,225,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    overflow: hidden;
+    transition: background .2s, border-color .2s, transform .25s;
+}
+.badge-next-card:hover {
+    background: rgba(240,235,225,0.04);
+    border-color: rgba(240,235,225,0.1);
+    transform: translateY(-2px);
+}
+/* Ligne pointillée en haut : indique que c'est "en cours" */
+.badge-next-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 10%; right: 10%;
+    height: 1px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(240,235,225,0.15) 0px,
+        rgba(240,235,225,0.15) 4px,
+        transparent 4px,
+        transparent 8px
+    );
+}
+
+.bnc-lock-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 12px;
+    opacity: 0.4;
+}
+
+.bnc-icon {
+    font-size: 34px;
+    flex-shrink: 0;
+    filter: grayscale(1);
+    opacity: 0.45;
+}
+
+.bnc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0; /* pour que text-overflow fonctionne */
+}
+
+.bnc-name {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+    color: rgba(240,235,225,0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bnc-desc {
+    font-size: 11px;
+    color: rgba(240,235,225,0.22);
+    line-height: 1.4;
+    /* Limite à 2 lignes */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ─── SECTION BADGES ────────────────────────────────────────────────────────── */
 .badges-section {
     padding-top: 48px !important;
 }
 
-/* ─── FILTER TABS ────────────────────────────────────────────────────────── */
+/* ─── BARRE DE CONTRÔLE (filtres + recherche) ───────────────────────────────── */
+.badge-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+}
+
+/* ─── FILTRES ───────────────────────────────────────────────────────────────── */
 .badge-filters {
     display: flex;
     gap: 8px;
-    margin-bottom: 36px;
 }
 
 .badge-filter {
@@ -204,14 +365,50 @@
     background: rgba(232,50,47,0.2);
 }
 
-/* ─── BADGE GRID V2 ──────────────────────────────────────────────────────── */
+/* ─── BARRE DE RECHERCHE ────────────────────────────────────────────────────── */
+.badge-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(240,235,225,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0 14px;
+    transition: border-color .2s, background .2s;
+}
+.badge-search-wrap:focus-within {
+    border-color: rgba(240,235,225,0.18);
+    background: rgba(240,235,225,0.07);
+}
+
+.bsw-icon {
+    font-size: 13px;
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.badge-search {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cream);
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    padding: 10px 0;
+    width: 200px;
+}
+.badge-search::placeholder {
+    color: rgba(240,235,225,0.28);
+}
+
+/* ─── GRILLE DE BADGES ──────────────────────────────────────────────────────── */
 .badges-v2-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 18px;
 }
 
-/* ─── BADGE CARD V2 ──────────────────────────────────────────────────────── */
+/* ─── CARTE DE BADGE ────────────────────────────────────────────────────────── */
 .badge-v2 {
     position: relative;
     background: rgba(17,16,16,0.8);
@@ -226,7 +423,7 @@
     transition: transform .25s, background .25s, border-color .25s;
 }
 
-/* Top accent bar */
+/* Barre d'accent en haut de chaque carte */
 .badge-v2::before {
     content: '';
     position: absolute;
@@ -247,7 +444,7 @@
 .badge-v2.unlocked:hover::before { transform: scaleX(1); }
 .badge-v2.locked:hover::before   { transform: scaleX(1); }
 
-/* Shine on unlocked cards */
+/* Effet de reflet sur les cartes débloquées */
 .bv2-shine {
     position: absolute;
     inset: 0;
@@ -266,16 +463,53 @@
     to   { background-position: 0% 0%; }
 }
 
-/* Lock overlay on locked cards */
+/* Cadenas sur les cartes verrouillées */
 .bv2-lock-overlay {
     position: absolute;
     top: 12px;
     right: 12px;
-    font-size: 14px;
-    opacity: 0.5;
+    font-size: 13px;
+    opacity: 0.45;
 }
 
-/* Icon */
+/* ─── PASTILLE DE RARITÉ ────────────────────────────────────────────────────── */
+.bv2-rarity {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+}
+
+.rarity-common {
+    color: rgba(240,235,225,0.4);
+    background: rgba(240,235,225,0.06);
+    border: 1px solid rgba(240,235,225,0.09);
+}
+.rarity-rare {
+    color: #60a5fa;
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.18);
+}
+.rarity-epic {
+    color: #c084fc;
+    background: rgba(192,132,252,0.08);
+    border: 1px solid rgba(192,132,252,0.18);
+}
+.rarity-legendary {
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.2);
+}
+.badge-v2.locked .bv2-rarity {
+    opacity: 0.3;
+}
+
+/* ─── ICÔNE ─────────────────────────────────────────────────────────────────── */
 .bv2-icon-wrap {
     width: 72px;
     height: 72px;
@@ -299,7 +533,7 @@
 
 .bv2-icon { font-size: 36px; line-height: 1; }
 
-/* Body */
+/* ─── CORPS DE LA CARTE ─────────────────────────────────────────────────────── */
 .bv2-body {
     display: flex;
     flex-direction: column;
@@ -338,7 +572,7 @@
     letter-spacing: 0.5px;
 }
 
-/* Empty states */
+/* ─── ÉTATS VIDES ────────────────────────────────────────────────────────────── */
 .badges-empty,
 .badges-filter-empty {
     grid-column: 1 / -1;
@@ -348,7 +582,7 @@
     font-size: 14px;
 }
 
-/* Stagger animation on grid cards */
+/* ─── ANIMATION DÉCALÉE SUR LA GRILLE (stagger) ─────────────────────────────── */
 .badges-v2-grid .badge-v2:nth-child(1)  { transition-delay: 0.03s; }
 .badges-v2-grid .badge-v2:nth-child(2)  { transition-delay: 0.07s; }
 .badges-v2-grid .badge-v2:nth-child(3)  { transition-delay: 0.11s; }
@@ -358,31 +592,41 @@
 .badges-v2-grid .badge-v2:nth-child(7)  { transition-delay: 0.27s; }
 .badges-v2-grid .badge-v2:nth-child(8)  { transition-delay: 0.31s; }
 
-/* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .badges-page-header  { padding: 40px 28px 36px; flex-direction: column; align-items: flex-start; gap: 28px; }
     .badges-global-progress { width: 100%; }
+    .badges-stats-strip  { grid-template-columns: repeat(2, 1fr); padding: 24px 28px; }
     .badges-featured-wrap { padding: 28px 28px 0; }
-    .badge-featured { padding: 28px 28px; gap: 24px; }
-    .bf-icon { font-size: 60px; }
-    .bf-name { font-size: 28px; }
+    .badge-featured      { padding: 28px 28px; gap: 24px; }
+    .bf-icon             { font-size: 60px; }
+    .bf-name             { font-size: 28px; }
+    .badges-next-wrap    { padding: 28px 28px 0; }
+    .badges-next-row     { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-    .badges-page-header { padding: 28px 20px 28px; }
-    .badges-main-title  { font-size: 42px; letter-spacing: -2px; }
+    .badges-page-header  { padding: 28px 20px 28px; }
+    .badges-main-title   { font-size: 42px; letter-spacing: -2px; }
+    .badges-stats-strip  { grid-template-columns: repeat(2, 1fr); padding: 20px; gap: 12px; }
     .badges-featured-wrap { padding: 20px 20px 0; }
-    .badge-featured { flex-direction: column; text-align: center; padding: 28px 20px; gap: 16px; }
-    .bf-glow { top: -80px; left: 50%; transform: translateX(-50%); }
-    .bf-icon { font-size: 64px; }
-    .bf-name { font-size: 28px; }
-    .bf-desc { max-width: 100%; }
-    .badge-filters { flex-wrap: wrap; }
-    .badges-v2-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .badge-featured      { flex-direction: column; text-align: center; padding: 28px 20px; gap: 16px; }
+    .bf-glow             { top: -80px; left: 50%; transform: translateX(-50%); }
+    .bf-icon             { font-size: 64px; }
+    .bf-name             { font-size: 28px; }
+    .bf-desc             { max-width: 100%; }
+    .badges-next-wrap    { padding: 20px 20px 0; }
+    .badges-next-row     { grid-template-columns: 1fr; }
+    .badge-controls      { flex-direction: column; align-items: flex-start; }
+    .badge-filters       { flex-wrap: wrap; }
+    .badge-search        { width: 100%; }
+    .badge-search-wrap   { width: 100%; }
+    .badges-v2-grid      { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
 @media (max-width: 480px) {
-    .badges-v2-grid { grid-template-columns: 1fr; }
-    .badge-filters { gap: 6px; }
-    .badge-filter  { padding: 9px 14px; font-size: 13px; }
+    .badges-stats-strip  { grid-template-columns: repeat(2, 1fr); }
+    .badges-v2-grid      { grid-template-columns: 1fr; }
+    .badge-filters       { gap: 6px; }
+    .badge-filter        { padding: 9px 14px; font-size: 13px; }
 }

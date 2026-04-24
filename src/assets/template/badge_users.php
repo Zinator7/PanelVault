@@ -38,36 +38,8 @@ foreach ($badges_possedes as $b) {
     $earned_at_map[(int)$b['id']] = $b['earned_at'];
 }
 
-// Badge featured = le plus récemment obtenu
+// Badge featured = le plus récemment obtenu (list_user_badges trie DESC earned_at)
 $featured_badge = $nb_badges > 0 ? $badges_possedes[0] : null;
-
-// Badges gagnés ce mois-ci
-$nb_earned_this_month = 0;
-$current_month = date('Y-m');
-foreach ($badges_possedes as $b) {
-    if (!empty($b['earned_at']) && strpos($b['earned_at'], $current_month) === 0) {
-        $nb_earned_this_month++;
-    }
-}
-
-// Prochains objectifs : les 3 premiers badges non débloqués
-$next_objectives = [];
-foreach ($tous_badges as $badge) {
-    if (!in_array((int)$badge['id'], $unlocked_ids)) {
-        $next_objectives[] = $badge;
-        if (count($next_objectives) >= 3) break;
-    }
-}
-
-// Rarité calculée depuis la position du badge dans la liste globale
-function get_rarity(int $index, int $total): array {
-    if ($total <= 1) return ['label' => 'Commun', 'class' => 'rarity-common'];
-    $pct = $index / ($total - 1);
-    if ($pct < 0.35) return ['label' => 'Commun',    'class' => 'rarity-common'];
-    if ($pct < 0.65) return ['label' => 'Rare',       'class' => 'rarity-rare'];
-    if ($pct < 0.85) return ['label' => 'Épique',     'class' => 'rarity-epic'];
-    return              ['label' => 'Légendaire', 'class' => 'rarity-legendary'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -158,7 +130,7 @@ function get_rarity(int $index, int $total): array {
     <!-- ═══ CONTENU PRINCIPAL ═══ -->
     <div class="dashboard-content">
 
-      <!-- ═══ EN-TÊTE DE PAGE ═══ -->
+      <!-- ═══ PAGE HEADER ═══ -->
       <div class="badges-page-header">
         <div class="badges-header-text">
           <p class="s-eyebrow">Récompenses</p>
@@ -171,6 +143,8 @@ function get_rarity(int $index, int $total): array {
             <?php endif; ?>
           </p>
         </div>
+
+        <!-- Barre de progression globale -->
         <div class="badges-global-progress">
           <div class="bgp-labels">
             <span><?php echo $nb_badges; ?> / <?php echo $nb_total_badges; ?> débloqués</span>
@@ -188,31 +162,7 @@ function get_rarity(int $index, int $total): array {
         </div>
       </div>
 
-      <!-- ═══ BANDE DE STATS RAPIDES ═══ -->
-      <div class="badges-stats-strip">
-        <div class="bss-card reveal">
-          <span class="bss-icon">🏅</span>
-          <span class="bss-value" data-target="<?php echo $nb_badges; ?>"><?php echo $nb_badges; ?></span>
-          <span class="bss-label">Débloqués</span>
-        </div>
-        <div class="bss-card reveal">
-          <span class="bss-icon">📊</span>
-          <span class="bss-value" data-target="<?php echo $progress_pct; ?>"><?php echo $progress_pct; ?><small>%</small></span>
-          <span class="bss-label">Complétion</span>
-        </div>
-        <div class="bss-card reveal">
-          <span class="bss-icon">✨</span>
-          <span class="bss-value" data-target="<?php echo $nb_earned_this_month; ?>"><?php echo $nb_earned_this_month; ?></span>
-          <span class="bss-label">Ce mois-ci</span>
-        </div>
-        <div class="bss-card reveal">
-          <span class="bss-icon">🔒</span>
-          <span class="bss-value" data-target="<?php echo $nb_locked; ?>"><?php echo $nb_locked; ?></span>
-          <span class="bss-label">À débloquer</span>
-        </div>
-      </div>
-
-      <!-- ═══ BADGE MIS EN AVANT ═══ -->
+      <!-- ═══ FEATURED (dernier badge obtenu) ═══ -->
       <?php if ($featured_badge): ?>
       <div class="badges-featured-wrap">
         <div class="badge-featured reveal">
@@ -229,71 +179,37 @@ function get_rarity(int $index, int $total): array {
       </div>
       <?php endif; ?>
 
-      <!-- ═══ PROCHAINS OBJECTIFS ═══ -->
-      <?php if (!empty($next_objectives)): ?>
-      <div class="badges-next-wrap">
-        <div class="badges-next-header reveal">
-          <p class="s-eyebrow">Prochains objectifs</p>
-          <h3 class="badges-next-title">À débloquer</h3>
-        </div>
-        <div class="badges-next-row">
-          <?php foreach ($next_objectives as $obj): ?>
-          <div class="badge-next-card reveal">
-            <div class="bnc-lock-badge">🔒</div>
-            <div class="bnc-icon"><?php echo $obj['icon']; ?></div>
-            <div class="bnc-body">
-              <span class="bnc-name"><?php echo htmlspecialchars($obj['name']); ?></span>
-              <span class="bnc-desc"><?php echo htmlspecialchars($obj['description']); ?></span>
-            </div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-      </div>
-      <?php endif; ?>
-
       <!-- ═══ FILTRES + GRILLE ═══ -->
       <section class="section badges-section">
 
-        <!-- Barre de contrôle : filtres à gauche, recherche à droite -->
-        <div class="badge-controls reveal">
-          <div class="badge-filters">
-            <button class="badge-filter active" data-filter="all">
-              Tous <span class="bf-count"><?php echo $nb_total_badges; ?></span>
-            </button>
-            <button class="badge-filter" data-filter="unlocked">
-              Débloqués <span class="bf-count"><?php echo $nb_badges; ?></span>
-            </button>
-            <button class="badge-filter" data-filter="locked">
-              Verrouillés <span class="bf-count"><?php echo $nb_locked; ?></span>
-            </button>
-          </div>
-          <div class="badge-search-wrap">
-            <span class="bsw-icon">🔍</span>
-            <input type="text" id="badgeSearch" class="badge-search" placeholder="Rechercher un badge…">
-          </div>
+        <!-- Filtres -->
+        <div class="badge-filters reveal">
+          <button class="badge-filter active" data-filter="all">
+            Tous <span class="bf-count"><?php echo $nb_total_badges; ?></span>
+          </button>
+          <button class="badge-filter" data-filter="unlocked">
+            Débloqués <span class="bf-count"><?php echo $nb_badges; ?></span>
+          </button>
+          <button class="badge-filter" data-filter="locked">
+            Verrouillés <span class="bf-count"><?php echo $nb_locked; ?></span>
+          </button>
         </div>
 
         <!-- Grille de badges -->
         <div class="badges-v2-grid" id="badgesGrid">
           <?php if ($nb_total_badges > 0): ?>
-            <?php foreach ($tous_badges as $i => $badge):
+            <?php foreach ($tous_badges as $badge):
               $is_unlocked = in_array((int)$badge['id'], $unlocked_ids);
               $earned      = $is_unlocked ? ($earned_at_map[(int)$badge['id']] ?? null) : null;
-              $rarity      = get_rarity($i, $nb_total_badges);
             ?>
               <div class="badge-v2 <?php echo $is_unlocked ? 'unlocked' : 'locked'; ?> reveal"
-                   data-status="<?php echo $is_unlocked ? 'unlocked' : 'locked'; ?>"
-                   data-name="<?php echo strtolower(htmlspecialchars($badge['name'])); ?>">
+                   data-status="<?php echo $is_unlocked ? 'unlocked' : 'locked'; ?>">
 
                 <?php if ($is_unlocked): ?>
                   <div class="bv2-shine"></div>
                 <?php else: ?>
                   <div class="bv2-lock-overlay">🔒</div>
                 <?php endif; ?>
-
-                <div class="bv2-rarity <?php echo $rarity['class']; ?>">
-                  <?php echo $rarity['label']; ?>
-                </div>
 
                 <div class="bv2-icon-wrap">
                   <span class="bv2-icon"><?php echo $badge['icon']; ?></span>
@@ -333,7 +249,7 @@ function get_rarity(int $index, int $total): array {
   <script>
   document.addEventListener('DOMContentLoaded', () => {
 
-    // ── Dropdown header ──────────────────────────────────────────
+    // Dropdown header
     const trigger = document.querySelector('.user-trigger');
     const menu    = document.querySelector('.user-dropdown-menu');
     if (trigger && menu) {
@@ -344,76 +260,31 @@ function get_rarity(int $index, int $total): array {
       menu.addEventListener('mouseleave',    () => { t = setTimeout(() => menu.style.display = 'none', 200); });
     }
 
-    // ── Animation d'apparition au scroll (IntersectionObserver) ──
+    // Reveal scroll
     const ro = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          ro.unobserve(e.target);
-        }
-      });
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
     }, { threshold: 0.06 });
     document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    // ── Compteur animé pour les stats strip ───────────────────────
-    // On attend 200ms que la page soit stable avant de lancer
-    setTimeout(() => {
-      document.querySelectorAll('.bss-value').forEach(el => {
-        const small  = el.querySelector('small');   // le petit "%" s'il existe
-        const target = parseInt(el.dataset.target); // la vraie valeur cible
-        if (isNaN(target) || target === 0) return;
-
-        let startTime = null;
-        const duration = 900; // durée de l'animation en ms
-
-        const step = (timestamp) => {
-          if (!startTime) startTime = timestamp;
-          // progress va de 0 à 1
-          const progress = Math.min((timestamp - startTime) / duration, 1);
-          // "ease-out cubic" : l'animation ralentit à la fin
-          const eased = 1 - Math.pow(1 - progress, 3);
-
-          el.textContent = Math.floor(eased * target);
-          if (small) el.appendChild(small); // on réattache le <small>%</small>
-
-          if (progress < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      });
-    }, 200);
-
-    // ── Filtres + Recherche combinés ──────────────────────────────
-    const filters      = document.querySelectorAll('.badge-filter');
-    const cards        = document.querySelectorAll('.badge-v2');
-    const emptyMsg     = document.getElementById('filterEmpty');
-    const searchInput  = document.getElementById('badgeSearch');
-    let   currentFilter = 'all';
-
-    function applyFilters() {
-      const searchVal = searchInput.value.toLowerCase().trim();
-      let visible = 0;
-
-      cards.forEach(card => {
-        const matchFilter = currentFilter === 'all' || card.dataset.status === currentFilter;
-        const matchSearch = searchVal === '' || card.dataset.name.includes(searchVal);
-        const show = matchFilter && matchSearch;
-        card.style.display = show ? '' : 'none';
-        if (show) visible++;
-      });
-
-      emptyMsg.style.display = visible === 0 ? 'block' : 'none';
-    }
+    // Filtres
+    const filters  = document.querySelectorAll('.badge-filter');
+    const cards    = document.querySelectorAll('.badge-v2');
+    const emptyMsg = document.getElementById('filterEmpty');
 
     filters.forEach(btn => {
       btn.addEventListener('click', () => {
         filters.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentFilter = btn.dataset.filter;
-        applyFilters();
+        const f = btn.dataset.filter;
+        let visible = 0;
+        cards.forEach(card => {
+          const show = f === 'all' || card.dataset.status === f;
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        emptyMsg.style.display = visible === 0 ? 'block' : 'none';
       });
     });
-
-    searchInput.addEventListener('input', applyFilters);
 
   });
   </script>
