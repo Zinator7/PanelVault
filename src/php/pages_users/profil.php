@@ -201,7 +201,7 @@ $tous_badges = ($nb_badges === 0) ? list_badges($conn) : [];
         <a href="profil.php" class="active">
           <span class="icon">👤</span> Mon Profil <!-- Lien actif vers le profil -->
         </a> 
-        <a href="#">
+        <a href="badge_users.php">
           <span class="icon">🏅</span> Mes Badges
         </a>
         <a href="../../../leaderboard.php">

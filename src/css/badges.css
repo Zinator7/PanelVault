@@ -625,7 +625,12 @@
 }
 
 @media (max-width: 480px) {
-    .badges-stats-strip  { grid-template-columns: repeat(2, 1fr); }
+    .badges-page-header  { padding: 24px 16px; }
+    .badges-stats-strip  { grid-template-columns: repeat(2, 1fr); padding: 16px; gap: 10px; }
+    .bss-value           { font-size: 30px; letter-spacing: -1.5px; }
+    .bss-value small     { font-size: 18px; }
+    .badges-featured-wrap { padding: 16px 16px 0; }
+    .badges-next-wrap    { padding: 16px 16px 0; }
     .badges-v2-grid      { grid-template-columns: 1fr; }
     .badge-filters       { gap: 6px; }
     .badge-filter        { padding: 9px 14px; font-size: 13px; }

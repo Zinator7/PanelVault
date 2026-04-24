@@ -166,7 +166,7 @@ $nb_total_bibli = $nb_comics_lus + count($lectures_en_cours);
                 <a href="profil.php">
                     <span class="icon">👤</span> Mon Profil
                 </a>
-                <a href="#">
+                <a href="badge_users.php">
                     <span class="icon">🏅</span> Mes Badges
                 </a>
                 <a href="../../../leaderboard.php">
