@@ -367,7 +367,8 @@ function get_rarity(int $index, int $total): array {
         if (isNaN(target) || target === 0) return;
 
         let startTime = null;
-        const duration = 900; // durée de l'animation en ms
+        const duration = 500; // Vitesse actuelle : 0.5 seconde
+        // const duration = 250; // DECOMMENTER CECI quand il y aura beaucoup de monde pour une vitesse éclair
 
         const step = (timestamp) => {
           if (!startTime) startTime = timestamp;

@@ -51,7 +51,8 @@ if (coversMosaic) {
 /* ═══ COMPTEURS ANIMÉS ═══ */
 function animateCounter(el) {
   const target = parseInt(el.dataset.target, 10);
-  const dur = 2000;
+  const dur = 800; // Vitesse actuelle : 0.8 seconde
+  // const dur = 400; // DECOMMENTER CECI quand il y aura beaucoup de monde pour une vitesse éclair
   const start = performance.now();
   function step(now) {
     const p = Math.min((now - start) / dur, 1);

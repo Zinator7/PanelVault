@@ -29,8 +29,7 @@
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/ton-pseudo/inkdex.git
-
+git clone https://github.com/Zinator7/PanelVault.git
 # Ouvrir index.html dans ton navigateur
 # (ou utiliser Live Server sur VS Code)
 ```

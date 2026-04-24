@@ -29,7 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chaque .ctr a un data-target="X" ; on anime de 0 vers X avec une ease-out
     function animateCounter(el) {
         const target   = parseInt(el.dataset.target) || 0;
-        const duration = 1200;
+        const duration = 600; // Vitesse actuelle : 0.6 seconde (plus dynamique)
+        // const duration = 300; // DECOMMENTER CECI quand il y aura beaucoup de monde pour une vitesse éclair
         const start    = performance.now();
         const step = (now) => {
             const progress = Math.min((now - start) / duration, 1);
